@@ -16,7 +16,8 @@ app.post('/', function(req, res) {
 
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
-  if (message.text.toLowerCase().indexOf('bot') < 0) {
+  var botActivator = 'bot '
+  if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
     // In case a message is not present, or if our message does not have the word marco in it, do nothing and return an empty response
     return res.end()
   }
@@ -25,7 +26,7 @@ app.post('/', function(req, res) {
   // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"
   // Remember to use your own API toked instead of the one below  "https://api.telegram.org/bot<your_api_token>/sendMessage"
   var result = message.text
-  result = result.substring('bot '.length)
+  result = result.substring(botActivator.length) 
   axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
