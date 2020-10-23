@@ -17,10 +17,10 @@ app.post('/', function(req, res) {
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
   var botActivator = 'bot '
-  if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
+  //if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
     // In case a message is not present, or if our message does not have the word marco in it, do nothing and return an empty response
-    return res.end()
-  }
+    //return res.end()
+  //}
 
   // If we've gotten this far, it means that we have received a message containing the word "marco".
   // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"
@@ -32,7 +32,7 @@ app.post('/', function(req, res) {
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
       {
         chat_id: message.chat.id,
-        text: result
+        text: message.text.toLowerCase().substring(0, botActivator.length)
       }
     )
     .then(response => {
