@@ -16,10 +16,10 @@ app.post('/', function(req, res) {
 
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
-  if (!message || message.text.toLowerCase().indexOf('marco') < 0) {
+  //if (!message || message.text.toLowerCase().indexOf('marco') < 0) {
     // In case a message is not present, or if our message does not have the word marco in it, do nothing and return an empty response
-    return res.end()
-  }
+   // return res.end()
+  //}
 
   // If we've gotten this far, it means that we have received a message containing the word "marco".
   // Respond by hitting the telegram bot API and responding to the approprite chat_id with the word "Polo!!"
