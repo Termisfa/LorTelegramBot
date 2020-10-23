@@ -17,7 +17,13 @@ app.post('/', function(req, res) {
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
   var botActivator = 'bot '
-  if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
+
+  if(!message)
+  {
+    return res.end()
+  }
+
+  else if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
     var result = message.text
   result = result.substring(botActivator.length) 
   axios
