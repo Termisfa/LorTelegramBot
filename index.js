@@ -26,6 +26,7 @@ app.post('/', function(req, res) {
   else if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
     var result = message.text
   result = result.substring(botActivator.length) 
+  console.log('llega hasta aqui')
   axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
@@ -41,6 +42,7 @@ app.post('/', function(req, res) {
     })
     .catch(err => {
       // ...and here if it was not
+      console.log
       console.log('Error :', err)
       res.end('Error :' + err)
     })
