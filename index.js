@@ -42,7 +42,7 @@ app.post('/', function(req, res) {
     })
     .catch(err => {
       // ...and here if it was not
-      console.log
+      console.log('He llegado aquí')
       console.log('Error :', err)
       res.end('Error :' + err)
     })
