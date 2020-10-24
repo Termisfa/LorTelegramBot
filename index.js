@@ -32,9 +32,13 @@ app.post('/', function(req, res) {
     return res.end()
   }
 
-  console.log(message.text)
+  
 
-  if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
+  if (message.text.toLowerCase().substring(0, botActivator.length) !== botActivator) {
+    return res.end()
+  }
+  else
+  {
     var result = message.text
     result = result.substring(botActivator.length) 
     
@@ -48,6 +52,7 @@ app.post('/', function(req, res) {
       )
       .then(response => {
         // We get here if the message was successfully posted
+        console.log('Entra en respuesta')
         console.log('Respuesta de telegram: ' + response.text)
         res.end('ok')
       })
@@ -57,8 +62,6 @@ app.post('/', function(req, res) {
         res.end('Error :' + err)
       })
   }
-
-  return res.end()
   
 })
 
