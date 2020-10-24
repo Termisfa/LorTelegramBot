@@ -17,10 +17,11 @@ app.post('/', function(req, res) {
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
   var botActivator = 'bot '
-  console.log('llega hasta aqui')
+  
 
   if(!message)
   {
+    console.log('llega hasta aqui')
     return res.end()
   }
 
