@@ -17,16 +17,17 @@ app.post('/', function(req, res) {
   //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
   var botActivator = 'bot '
+  console.log('llega hasta aqui')
 
   if(!message)
   {
     return res.end()
   }
 
-  else if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
+  if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
     var result = message.text
   result = result.substring(botActivator.length) 
-  console.log('llega hasta aqui')
+  
   axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
