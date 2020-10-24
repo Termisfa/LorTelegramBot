@@ -18,7 +18,7 @@ app.post('/', function(req, res) {
 
   var botActivator = 'bot '
   
-  console.log(message.text)
+  
 
   if(!message)
   {
@@ -31,6 +31,8 @@ app.post('/', function(req, res) {
     console.log('llega hasta mensaje es demasiado corto')
     return res.end()
   }
+
+  console.log(message.text)
 
   if (message.text.toLowerCase().substring(0, botActivator.length) === botActivator) {
     var result = message.text
