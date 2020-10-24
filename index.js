@@ -48,7 +48,7 @@ app.post('/', function(req, res) {
       )
       .then(response => {
         // We get here if the message was successfully posted
-        console.log('Respuesta de telegram: ' + response.message.text)
+        console.log('Respuesta de telegram: ' + response.text)
         res.end('ok')
       })
       .catch(err => {
