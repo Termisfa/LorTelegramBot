@@ -18,10 +18,11 @@ app.post('/', function(req, res) {
 
   var botActivator = 'bot '
   
+  console.log(message.text)
 
   if(!message)
   {
-    console.log('llega hasta aqui')
+    console.log('llega hasta !message')
     return res.end()
   }
 
