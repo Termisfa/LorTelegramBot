@@ -3,6 +3,9 @@ var app = express()
 var bodyParser = require('body-parser')
 const axios = require('axios')
 
+'use strict'
+const allCardsInfo = require('./allSets-es_es.json')
+
 app.use(bodyParser.json()) // for parsing application/json
 app.use(
   bodyParser.urlencoded({
@@ -18,8 +21,6 @@ app.post('/', function(req, res) {
 
   var botActivator = 'bot '
   
-  
-
   if(!message)
   {
     console.log('llega hasta !message')
@@ -39,31 +40,36 @@ app.post('/', function(req, res) {
   }
   else
   {
-    var result = message.text
-    result = result.substring(botActivator.length) 
-    
-    axios
-      .post(
-        'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
-        {
-          chat_id: message.chat.id,
-          text: result
-        }
-      )
-      .then(response => {
-        // We get here if the message was successfully posted
-        console.log('Entra en respuesta')
-        console.log('Respuesta de telegram: ' + response.ok)
-        res.end('ok')
-      })
-      .catch(err => {
-        // ...and here if it was not
-        console.log('Error :', err)
-        res.end('Error :' + err)
-      })
+    var result = message.text.substring(botActivator.length) 
+
+    postMessage(message, result)
+
   }
   
 })
+
+function postMessage(message, result)
+{
+  axios
+  .post(
+    'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
+    {
+      chat_id: message.chat.id,
+      text: result
+    }
+  )
+  .then(response => {
+    // We get here if the message was successfully posted
+    console.log('Entra en respuesta')
+    console.log('Respuesta de telegram: ' + response.ok)
+    res.end('ok')
+  })
+  .catch(err => {
+    // ...and here if it was not
+    console.log('Error :', err)
+    res.end('Error :' + err)
+  })
+}
 
 // Finally, start our server
 app.listen(3000, function() {
