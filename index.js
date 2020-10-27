@@ -41,16 +41,28 @@ app.post('/', function(req, res) {
   else
   {
     var msgReceived = message.text.substring(botActivator.length) 
-    /*
-    let infoCardsProv = 
+    
+    let infoCardsProv = []
 
     allCardsInfo.forEach(element => {
-      if(element.name.includes("gemelas"))
-          console.log(element.name)    
-    });*/
+      if(element.name.toLowerCase().includes(msgReceived.toLowerCase()))
+          infoCardsProv.push([element.name, element.assets.gameAbsolutePath])    
+    });
+
+    //Si ha encontrado más de 2 cartas que contenga ese nombre
+    if(infoCardsProv.length > 2)
+    {
+      
+    }
+    else
+    {
+      infoCardsProv.forEach(element => {
+        postMessage(message, element[1], res)
+      });
+    
+    }
 
     postMessage(message, msgReceived, res)
-    postMessage(message, "prueba", res)
   }
   
 })
