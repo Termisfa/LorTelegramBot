@@ -51,22 +51,31 @@ app.post('/', function(req, res) {
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
-      postMessage(message, "No se ha encontrado ninguna carta", res)
+      postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '__" + msgReceived + "__'", res)
     }
     //Si ha encontrado más de 2 cartas que contenga ese nombre
     else if(infoCardsProv.length > 2)
     {
-      
+      let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '__" + msgReceived + "__'. "
+      if(infoCardsProv.length > 10)
+        aux += "Especifica más por favor."
+      else
+      {
+        aux += "Listado de cartas encontradas: "
+        infoCardsProv.forEach(element => {
+          aux += "__" + element [0] +"__"      
+        });
+      }
+      postMessage(message, aux, res)
     }
     else
     {
       infoCardsProv.forEach(element => {
+        console.log(element[1])
         postMessage(message, element[1], res)
       });
     
     }
-
-    postMessage(message, msgReceived, res)
   }
   
 })
