@@ -75,7 +75,7 @@ app.post('/', function(req, res) {
       console.log("Tamaño de infoCardsProv = " + infoCardsProv.length)
       infoCardsProv.forEach(element => {
         console.log(element[1])
-        //postMessage(message, element[1], res)
+        postMessage(message, element[1], res)
       });
     
     }
