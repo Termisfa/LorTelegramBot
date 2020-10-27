@@ -100,7 +100,7 @@ function postMessage(message, result, res)
     )
     .then(response => {
       // We get here if the message was successfully posted
-      console.log('Entra en respuesta')
+      console.log('Entra en respuesta texto OK')
       console.log('Respuesta de telegram: ' + response.ok)
       res.end('ok')
     })
@@ -116,6 +116,7 @@ function postMessage(message, result, res)
   }
 }
 
+//Para mandar foto. Result puede ser una url o la ruta a la imagen
 function sendPhoto(message, result, res)
 {
   try {   
@@ -129,8 +130,7 @@ function sendPhoto(message, result, res)
     )
     .then(response => {
       // We get here if the message was successfully posted
-      console.log('Entra en respuesta')
-      console.log('Respuesta de telegram: ' + response.ok)
+      console.log('Entra en respuesta foto OK')
       res.end('ok')
     })
     .catch(err => {
@@ -139,7 +139,7 @@ function sendPhoto(message, result, res)
       res.end('Error :' + err)
     })
   } catch (error) {
-    console.log("Error en postMessage")
+    console.log("Error en sendPhoto")
     console.log(error)
     res.end()
   }
