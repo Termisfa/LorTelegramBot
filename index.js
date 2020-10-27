@@ -73,10 +73,8 @@ app.post('/', function(req, res) {
       }
       else
       {
-        console.log("Tamaño de infoCardsProv = " + infoCardsProv.length)
         infoCardsProv.forEach(element => {
-          console.log(element[1])
-          postMessage(message, element[1], res)
+          sendPhoto(message, element[1], res)
         });
       
       }
@@ -95,6 +93,35 @@ function postMessage(message, result, res)
     axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
+      {
+        chat_id: message.chat.id,
+        text: result
+      }
+    )
+    .then(response => {
+      // We get here if the message was successfully posted
+      console.log('Entra en respuesta')
+      console.log('Respuesta de telegram: ' + response.ok)
+      res.end('ok')
+    })
+    .catch(err => {
+      // ...and here if it was not
+      console.log('Error :', err)
+      res.end('Error :' + err)
+    })
+  } catch (error) {
+    console.log("Error en postMessage")
+    console.log(error)
+    res.end()
+  }
+}
+
+function sendPhoto(message, result, res)
+{
+  try {   
+    axios
+    .post(
+      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
         text: result
