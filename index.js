@@ -48,9 +48,13 @@ app.post('/', function(req, res) {
       if(element.name.toLowerCase().includes(msgReceived.toLowerCase()))
           infoCardsProv.push([element.name, element.assets.gameAbsolutePath])    
     });
-
+    //Si no ha encontrado ninguna carta
+    if(infoCardsProv.length == 0)
+    {
+      postMessage(message, "No se ha encontrado ninguna carta", res)
+    }
     //Si ha encontrado más de 2 cartas que contenga ese nombre
-    if(infoCardsProv.length > 2)
+    else if(infoCardsProv.length > 2)
     {
       
     }
