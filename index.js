@@ -42,13 +42,13 @@ app.post('/', function(req, res) {
   {
     var result = message.text.substring(botActivator.length) 
 
-    postMessage(message, result)
+    postMessage(message, result, res)
 
   }
   
 })
 
-function postMessage(message, result)
+function postMessage(message, result, res)
 {
   axios
   .post(
