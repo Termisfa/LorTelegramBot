@@ -124,7 +124,7 @@ function sendPhoto(message, result, res)
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
-        text: result
+        photo: result
       }
     )
     .then(response => {
