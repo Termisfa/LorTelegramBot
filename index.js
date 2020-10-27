@@ -46,7 +46,7 @@ app.post('/', function(req, res) {
 
     allCardsInfo.forEach(element => {
       if(element.name.toLowerCase().includes(msgReceived.toLowerCase()))
-          infoCardsProv.push([element.name, element.assets.gameAbsolutePath])    
+          infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
     });
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
