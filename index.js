@@ -40,10 +40,17 @@ app.post('/', function(req, res) {
   }
   else
   {
-    var result = message.text.substring(botActivator.length) 
+    var msgReceived = message.text.substring(botActivator.length) 
+    /*
+    let infoCardsProv = 
 
-    postMessage(message, result, res)
+    allCardsInfo.forEach(element => {
+      if(element.name.includes("gemelas"))
+          console.log(element.name)    
+    });*/
 
+    postMessage(message, msgReceived, res)
+    postMessage(message, "prueba", res)
   }
   
 })
