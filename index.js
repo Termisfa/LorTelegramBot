@@ -87,11 +87,11 @@ app.post('/', function(req, res) {
           else
           {  
             var promisesArrayProv = []
-            
+            /*   
             infoCardsProv.forEach(element => {
               promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
             });           
-            /*         
+                  
             var imagePath = mergeAndDeleteImgs(promisesArrayProv)
             sendPhoto(message, imagePath, res)
             */
@@ -201,6 +201,7 @@ function postMessage(message, result, res)
     console.log(error)
     res.end()
   }
+  res.end()
 }
 
 //Para mandar foto. Result puede ser una url o la ruta a la imagen
