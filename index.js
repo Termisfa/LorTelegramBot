@@ -32,9 +32,8 @@ const download = (url, path) => {
 
 
 //This is the route the API will call
-try { 
 app.post('/', function(req, res) {
-    
+  try {     
     const { message } = req.body
 
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
@@ -99,12 +98,14 @@ app.post('/', function(req, res) {
         }
       }
     }
- })
-} catch (error) {
-  console.log("Error en app.post")
-  console.log(error)
-} 
+  } catch (error) {
+    console.log("Error en app.post")
+    console.log(error)
+    res.end()
+  }  
+})
 
+/*
 //Merge imagen, y borrado de las auxiliares. Devuelve ruta a enviar
 function mergeAndDeleteImgs(promisesArrayProv)
 {
@@ -118,7 +119,7 @@ function mergeAndDeleteImgs(promisesArrayProv)
           values.forEach(element => {
             fs.unlinkSync(element)
           });              
-          */                                      
+          */ /*                                     
         });
     })})
     return txtOut
@@ -129,6 +130,7 @@ function mergeAndDeleteImgs(promisesArrayProv)
     return null
   }
 }
+*/
 
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
 function checkCorrectName(infoCardsProv, msgReceived, res, message)
