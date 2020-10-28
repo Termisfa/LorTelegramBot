@@ -16,7 +16,7 @@ class Database
         let infoCardsProv = []
         allCardsInfo.forEach(card => {
             if(card.name.toLowerCase().includes(cardName.toLowerCase()) && card.cardCode.length == 7)
-                CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs)
+                infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs))
             //infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
         return infoCardsProv
@@ -24,3 +24,4 @@ class Database
 }
 
 module.exports = Database
+
