@@ -99,12 +99,12 @@ app.post('/', function(req, res) {
         }
       }
     }
-    console.log("Aqui")
   } catch (error) {
     console.log("Error en app.post")
     console.log(error)
     res.end()
   }  
+  res.end()
 })
 
 /*
