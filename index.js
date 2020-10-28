@@ -85,7 +85,7 @@ app.post('/', function(req, res) {
           //Si hay varias coincidencias, entrar a merge
           else
           {  
-            var promisesArrayProv = []
+            //var promisesArrayProv = []
             /*
             infoCardsProv.forEach(element => {
               promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
@@ -93,7 +93,7 @@ app.post('/', function(req, res) {
             var imagePath = mergeAndDeleteImgs(promisesArrayProv)
             sendPhoto(message, imagePath, res)
             */
-            console.log("infoCardsProv.length")
+            console.log(infoCardsProv[0])
           }
         }
       }
