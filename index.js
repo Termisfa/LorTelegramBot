@@ -2,7 +2,7 @@ var express = require('express')
 var app = express()
 var bodyParser = require('body-parser')
 const axios = require('axios')
-var Database = require('./Database')
+var {Database} = require('./Database')
 
 'use strict'
 
