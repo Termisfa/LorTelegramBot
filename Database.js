@@ -3,22 +3,17 @@ var bodyParser = require('body-parser')
 var express = require('express')
 var app = express()
 
-var allCardsInfo
+const allCardsInfo = require('./allSets-es_es.json')
+
+app.use(bodyParser.json()) // for parsing application/json
+app.use(
+bodyParser.urlencoded({
+    extended: true
+})
+) // for parsing application/x-www-form-urlencoded
 
 class Database
 {
-    static buildDatabase()
-    {
-        allCardsInfo = require('./allSets-es_es.json')
-
-        app.use(bodyParser.json()) // for parsing application/json
-        app.use(
-        bodyParser.urlencoded({
-            extended: true
-        })
-        ) // for parsing application/x-www-form-urlencoded
-    }
-
     static searchCardByName(cardName)
     {
         let infoCardsProv = []

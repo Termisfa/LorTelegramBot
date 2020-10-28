@@ -150,7 +150,6 @@ function sendPhoto(message, result, res)
 
 // Finally, start our server
 app.listen(3000, function() {
-  Database.buildDatabase()
   console.log('Telegram app listening on port 3000!')
 })
 
