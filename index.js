@@ -80,7 +80,7 @@ app.post('/', function(req, res) {
         if(checkCorrectName(infoCardsProv, msgReceived, res, message))
         {
           //Si solo hay una coincidencia, simplemente la envía
-          if(infoCardsProv == 1)
+          if(infoCardsProv.length == 1)
             sendPhoto(message, infoCardsProv[0].imageUrl, res)
           //Si hay varias coincidencias, entrar a merge
           else
