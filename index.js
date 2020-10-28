@@ -86,11 +86,12 @@ app.post('/', function(req, res) {
           //Si hay varias coincidencias, entrar a merge
           else
           {  
-            //var promisesArrayProv = []
-            /*
+            var promisesArrayProv = []
+            
             infoCardsProv.forEach(element => {
               promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
-            });                    
+            });           
+            /*         
             var imagePath = mergeAndDeleteImgs(promisesArrayProv)
             sendPhoto(message, imagePath, res)
             */
@@ -107,7 +108,7 @@ app.post('/', function(req, res) {
   res.end()
 })
 
-/*
+
 //Merge imagen, y borrado de las auxiliares. Devuelve ruta a enviar
 function mergeAndDeleteImgs(promisesArrayProv)
 {
@@ -132,7 +133,7 @@ function mergeAndDeleteImgs(promisesArrayProv)
     return null
   }
 }
-*/
+
 
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
 function checkCorrectName(infoCardsProv, msgReceived, res, message)
