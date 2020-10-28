@@ -14,9 +14,10 @@ class Database
     static searchCardByName(cardName)
     {
         let infoCardsProv = []
-        allCardsInfo.forEach(element => {
-            if(element.name.toLowerCase().includes(cardName.toLowerCase()) && element.cardCode.length == 7)
-                infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
+        allCardsInfo.forEach(card => {
+            if(card.name.toLowerCase().includes(cardName.toLowerCase()) && card.cardCode.length == 7)
+                CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs)
+            //infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
         return infoCardsProv
     }

@@ -3,6 +3,7 @@ var app = express()
 var bodyParser = require('body-parser')
 const axios = require('axios')
 var Database = require('./Database')
+var CardInfo = require('./CardInfo')
 
 
 'use strict'
@@ -57,7 +58,7 @@ app.post('/', function(req, res) {
       {
       
         let infoCardsProv = Database.searchCardByName(msgReceived)
-        console.log(infoCardsProv[0])
+        
 
         
         //Si no ha encontrado ninguna carta
@@ -75,7 +76,7 @@ app.post('/', function(req, res) {
           {
             aux += "Listado de cartas encontradas: "
             infoCardsProv.forEach(element => {
-              aux += "'" + element [0] + "', "      
+              aux += "'" + element.name + "', "      
             });
             //Quitamos la coma y el espacio final
             aux.substring(0, aux.length - 2)
@@ -85,7 +86,7 @@ app.post('/', function(req, res) {
         else
         {
           infoCardsProv.forEach(element => {
-            sendPhoto(message, element[1], res)
+            sendPhoto(message, element.imageUrl, res)
           });
         
         }
