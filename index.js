@@ -6,6 +6,13 @@ var Database = require('./Database')
 
 'use strict'
 
+app.use(bodyParser.json()) // for parsing application/json
+app.use(
+bodyParser.urlencoded({
+    extended: true
+})
+) // for parsing application/x-www-form-urlencoded
+
 
 //This is the route the API will call
 app.post('/', function(req, res) {
