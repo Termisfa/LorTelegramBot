@@ -2,7 +2,7 @@ const CardInfo = require('./CardInfo')
 var bodyParser = require('body-parser')
 var app = express()
 
-const allCardsInfo
+var allCardsInfo
 
 class Database
 {
