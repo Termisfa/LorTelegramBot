@@ -201,7 +201,6 @@ function postMessage(message, result, res)
     console.log(error)
     res.end()
   }
-  res.end()
 }
 
 //Para mandar foto. Result puede ser una url o la ruta a la imagen
