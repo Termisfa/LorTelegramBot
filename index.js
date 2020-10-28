@@ -93,7 +93,7 @@ app.post('/', function(req, res) {
             var imagePath = mergeAndDeleteImgs(promisesArrayProv)
             sendPhoto(message, imagePath, res)
             */
-            console.log(infoCardsProv.length)
+            console.log("infoCardsProv.length")
           }
         }
       }
