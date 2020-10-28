@@ -122,7 +122,7 @@ function mergeAndDeleteImgs(promisesArrayProv)
           values.forEach(element => {
             fs.unlinkSync(element)
           });              
-          */ /*                                     
+          */                                      
         });
     })})
     return txtOut
