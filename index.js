@@ -26,7 +26,7 @@ const download = (url, path) => {
   return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
     request(url)
       .pipe(fs.createWriteStream(path))
-      .on('close', () => resolve(console.log(path + " creada")))
+      .on('close', () => resolve(path))
   }) })
 }
 
@@ -75,14 +75,23 @@ app.post('/', function(req, res) {
       //No lleva la palabra rel
       else
       {      
-        let infoCardsProv = Database.searchCardByName(msgReceived)
-        
+        let infoCardsProv = Database.searchCardByName(msgReceived)       
 
         if(checkCorrectName(infoCardsProv, msgReceived, res, message))
         {
-          infoCardsProv.forEach(element => {
-            sendPhoto(message, element.imageUrl, res)
-          });        
+          //Si solo hay una coincidencia, simplemente la envía
+          if(infoCardsProv == 1)
+            sendPhoto(message, infoCardsProv[0].imageUrl, res)
+          //Si hay varias coincidencias, entrar a merge
+          else
+          {  
+            var promisesArrayProv = []
+            infoCardsProv.forEach(element => {
+              promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
+            });                    
+            var imagePath = mergeImg(promisesArrayProv)
+            sendPhoto(message, imagePath, res)
+          }
         }
       }
     }
@@ -92,6 +101,30 @@ app.post('/', function(req, res) {
     res.end()
   }  
 })
+
+//Merge imagen, y borrado de las auxiliares. Devuelve ruta a enviar
+function mergeImg(promisesArrayProv)
+{
+  try {
+    
+
+  var txtOut = 'out.png'
+  Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
+    .then((img) => {
+      img.write(txtOut, () => {
+        console.log('done3')
+        values.forEach(element => {
+          fs.unlinkSync(element)
+        });                                                    
+      });
+  })})
+  return txtOut
+
+  } catch (error) {
+    console.log("Error en mergeImg")
+    console.log(error)
+  }
+}
 
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
 function checkCorrectName(infoCardsProv, msgReceived, res, message)

@@ -20,7 +20,7 @@ const download = (url, path) => {
   return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
     request(url)
       .pipe(fs.createWriteStream(path))
-      .on('close', () => resolve(console.log(path + " creada")))
+      .on('close', () => resolve(path))
   }) })
 }
 
@@ -29,16 +29,23 @@ var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT04
 
 var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', './image1.png')
 
+let promisesArrayProv = []
+promisesArrayProv.push(promise1)
+promisesArrayProv.push(promise2)
 
 
 
-Promise.all([promise1, promise2]).then( () => { mergeImg(['image.png', 'image1.png'])
+
+Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
                                                 .then((img) => {
                                                   img.write('out.png', () => {
                                                     console.log('done3')
-                                                    fs.unlinkSync('image.png')
+                                                    values.forEach(element => {
+                                                      fs.unlinkSync(element)
+                                                    });                                                    
                                                   });
 })})
 
+//Promise.all([promise1, promise2]).then( (values) => {console.log(values[0])})
 
  
