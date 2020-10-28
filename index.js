@@ -113,9 +113,11 @@ function mergeAndDeleteImgs(promisesArrayProv)
     .then((img) => {
       img.write(txtOut, () => {
         console.log('done3')
+        /*
         values.forEach(element => {
           fs.unlinkSync(element)
-        });                                                    
+        });              
+        */                                      
       });
   })})
   return txtOut
