@@ -89,7 +89,7 @@ app.post('/', function(req, res) {
             infoCardsProv.forEach(element => {
               promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
             });                    
-            var imagePath = mergeImg(promisesArrayProv)
+            var imagePath = mergeAndDeleteImgs(promisesArrayProv)
             sendPhoto(message, imagePath, res)
           }
         }
@@ -103,7 +103,7 @@ app.post('/', function(req, res) {
 })
 
 //Merge imagen, y borrado de las auxiliares. Devuelve ruta a enviar
-function mergeImg(promisesArrayProv)
+function mergeAndDeleteImgs(promisesArrayProv)
 {
   try {
     
