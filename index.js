@@ -21,6 +21,7 @@ const mergeImg = require('merge-img')
 
 const fs = require('fs')
 const request = require('request')
+const { info } = require('console')
 
 const download = (url, path) => {
   return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
@@ -136,6 +137,7 @@ function mergeAndDeleteImgs(promisesArrayProv)
 function checkCorrectName(infoCardsProv, msgReceived, res, message)
 {
   try { 
+    console.log("Cartas encontradas: " + infoCardsProv.length)
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
