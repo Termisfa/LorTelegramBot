@@ -89,8 +89,9 @@ app.post('/', function(req, res) {
             infoCardsProv.forEach(element => {
               promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
             });                    
-            var imagePath = mergeAndDeleteImgs(promisesArrayProv)
-            sendPhoto(message, imagePath, res)
+            //var imagePath = mergeAndDeleteImgs(promisesArrayProv)
+            //sendPhoto(message, imagePath, res)
+            console.log(promisesArrayProv.length)
           }
         }
       }
@@ -227,7 +228,7 @@ function sendPhoto(message, result, res)
 // Finally, start our server
 app.listen(3000, function() {
   /*
-  
+
   var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png')
   var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', './image1.png')
   let promisesArrayProv = []
