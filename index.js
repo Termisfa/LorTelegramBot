@@ -56,6 +56,7 @@ app.post('/', function(req, res) {
       {
       
         let infoCardsProv = Database.searchCardByName(msgReceived)
+        console.log(infoCardsProv[0])
 
         
         //Si no ha encontrado ninguna carta
