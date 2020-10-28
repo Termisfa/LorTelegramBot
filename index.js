@@ -68,7 +68,7 @@ app.post('/', function(req, res) {
 
         let infoCardsProv = Database.searchCardByName(msgReceived)
 
-        
+
       } 
 
       else
@@ -94,32 +94,39 @@ app.post('/', function(req, res) {
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
 function checkCorrectName(infoCardsProv, msgReceived, res)
 {
-  //Si no ha encontrado ninguna carta
-  if(infoCardsProv.length == 0)
-  {
-    postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
-    return false
-  }
-  //Si ha encontrado más de 2 cartas que contenga ese nombre
-  else if(infoCardsProv.length > 5)
-  {
-    let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
-    if(infoCardsProv.length > 15)
-      aux += "Especifica más por favor."
-    else
+  try {
+    
+  
+    //Si no ha encontrado ninguna carta
+    if(infoCardsProv.length == 0)
     {
-      aux += "Listado de cartas encontradas: "
-      infoCardsProv.forEach(element => {
-        aux += "'" + element.name + "', "      
-      });
-      //Quitamos la coma y el espacio final
-      aux.substring(0, aux.length - 2)
+      postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
+      return false
     }
-    postMessage(message, aux, res)
-    return false
+    //Si ha encontrado más de 2 cartas que contenga ese nombre
+    else if(infoCardsProv.length > 5)
+    {
+      let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
+      if(infoCardsProv.length > 15)
+        aux += "Especifica más por favor."
+      else
+      {
+        aux += "Listado de cartas encontradas: "
+        infoCardsProv.forEach(element => {
+          aux += "'" + element.name + "', "      
+        });
+        //Quitamos la coma y el espacio final
+        aux.substring(0, aux.length - 2)
+      }
+      postMessage(message, aux, res)
+      return false
+    }
+    //Si todo es correcto
+    return true
+  } catch (error) {
+    console.log("Error en checkCorrectName")
+    console.log(error)
   }
-  //Si todo es correcto
-  return true
 }
 
 
