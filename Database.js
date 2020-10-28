@@ -15,7 +15,7 @@ class Database
     {
         let infoCardsProv = []
         allCardsInfo.forEach(element => {
-            if(element.name.toLowerCase().includes(msgReceived.toLowerCase()) && element.cardCode.length == 7)
+            if(element.name.toLowerCase().includes(cardName.toLowerCase()) && element.cardCode.length == 7)
                 infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
         return infoCardsProv
