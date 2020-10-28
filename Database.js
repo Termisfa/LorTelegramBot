@@ -18,6 +18,7 @@ class Database
             if(element.name.toLowerCase().includes(msgReceived.toLowerCase()) && element.cardCode.length == 7)
                 infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
+        return infoCardsProv
     }
 }
 
