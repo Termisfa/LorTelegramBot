@@ -4,16 +4,30 @@ var bodyParser = require('body-parser')
 const axios = require('axios')
 var Database = require('./Database')
 var CardInfo = require('./CardInfo')
-
-
 'use strict'
 
+
+//Esta parte es necesaria para que el bot funcione
 app.use(bodyParser.json()) // for parsing application/json
 app.use(
 bodyParser.urlencoded({
     extended: true
 })
 ) // for parsing application/x-www-form-urlencoded
+
+//Código necesario para descargar
+const mergeImg = require('merge-img')
+
+const fs = require('fs')
+const request = require('request')
+
+const download = (url, path) => {
+  return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
+    request(url)
+      .pipe(fs.createWriteStream(path))
+      .on('close', () => resolve(console.log(path + " creada")))
+  }) })
+}
 
 
 //This is the route the API will call
@@ -52,43 +66,21 @@ app.post('/', function(req, res) {
       {
         msgReceived = msgReceived.substring(relatedActivator.length)
 
+        let infoCardsProv = Database.searchCardByName(msgReceived)
+
+        
       } 
 
       else
-      {
-      
+      {      
         let infoCardsProv = Database.searchCardByName(msgReceived)
         
 
-        
-        //Si no ha encontrado ninguna carta
-        if(infoCardsProv.length == 0)
-        {
-          postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
-        }
-        //Si ha encontrado más de 2 cartas que contenga ese nombre
-        else if(infoCardsProv.length > 2)
-        {
-          let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
-          if(infoCardsProv.length > 10)
-            aux += "Especifica más por favor."
-          else
-          {
-            aux += "Listado de cartas encontradas: "
-            infoCardsProv.forEach(element => {
-              aux += "'" + element.name + "', "      
-            });
-            //Quitamos la coma y el espacio final
-            aux.substring(0, aux.length - 2)
-          }
-          postMessage(message, aux, res)
-        }
-        else
+        if(checkCorrectName)
         {
           infoCardsProv.forEach(element => {
             sendPhoto(message, element.imageUrl, res)
-          });
-        
+          });        
         }
       }
     }
@@ -96,10 +88,42 @@ app.post('/', function(req, res) {
     console.log("Error en app.post")
     console.log(error)
     res.end()
-  }
-  
+  }  
 })
 
+//Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
+function checkCorrectName(infoCardsProv, msgReceived, res)
+{
+  //Si no ha encontrado ninguna carta
+  if(infoCardsProv.length == 0)
+  {
+    postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
+    return false
+  }
+  //Si ha encontrado más de 2 cartas que contenga ese nombre
+  else if(infoCardsProv.length > 5)
+  {
+    let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
+    if(infoCardsProv.length > 15)
+      aux += "Especifica más por favor."
+    else
+    {
+      aux += "Listado de cartas encontradas: "
+      infoCardsProv.forEach(element => {
+        aux += "'" + element.name + "', "      
+      });
+      //Quitamos la coma y el espacio final
+      aux.substring(0, aux.length - 2)
+    }
+    postMessage(message, aux, res)
+    return false
+  }
+  //Si todo es correcto
+  return true
+}
+
+
+//Para mandar un mensaje
 function postMessage(message, result, res)
 {
   try {   
