@@ -86,12 +86,14 @@ app.post('/', function(req, res) {
           else
           {  
             var promisesArrayProv = []
+            /*
             infoCardsProv.forEach(element => {
               promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
             });                    
-            //var imagePath = mergeAndDeleteImgs(promisesArrayProv)
-            //sendPhoto(message, imagePath, res)
-            console.log(promisesArrayProv.length)
+            var imagePath = mergeAndDeleteImgs(promisesArrayProv)
+            sendPhoto(message, imagePath, res)
+            */
+            console.log(infoCardsProv.length)
           }
         }
       }
