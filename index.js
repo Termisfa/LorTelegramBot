@@ -2,16 +2,10 @@ var express = require('express')
 var app = express()
 var bodyParser = require('body-parser')
 const axios = require('axios')
+var Database = require('./Database')
 
 'use strict'
-const allCardsInfo = require('./allSets-es_es.json')
 
-app.use(bodyParser.json()) // for parsing application/json
-app.use(
-  bodyParser.urlencoded({
-    extended: true
-  })
-) // for parsing application/x-www-form-urlencoded
 
 //This is the route the API will call
 app.post('/', function(req, res) {
@@ -42,41 +36,50 @@ app.post('/', function(req, res) {
     else
     {
       var msgReceived = message.text.substring(botActivator.length) 
-      
-      let infoCardsProv = []
 
-      allCardsInfo.forEach(element => {
-        if(element.name.toLowerCase().includes(msgReceived.toLowerCase()) && element.cardCode.length == 7)
-            infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
-      });
-      //Si no ha encontrado ninguna carta
-      if(infoCardsProv.length == 0)
+      var relatedActivator = "rel"
+      //Si lleva la palabra rel, para cartas relacionadas
+      if(msgReceived.substring(0, relatedActivator.length) === relatedActivator)
       {
-        postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
-      }
-      //Si ha encontrado más de 2 cartas que contenga ese nombre
-      else if(infoCardsProv.length > 2)
-      {
-        let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
-        if(infoCardsProv.length > 10)
-          aux += "Especifica más por favor."
-        else
-        {
-          aux += "Listado de cartas encontradas: "
-          infoCardsProv.forEach(element => {
-            aux += "'" + element [0] + "', "      
-          });
-          //Quitamos la coma y el espacio final
-          aux.substring(0, aux.length - 2)
-        }
-        postMessage(message, aux, res)
-      }
+        msgReceived = msgReceived.substring(relatedActivator.length)
+
+      } 
+
       else
       {
-        infoCardsProv.forEach(element => {
-          sendPhoto(message, element[1], res)
-        });
       
+        let infoCardsProv = Database.searchCardByName(msgReceived)
+
+        
+        //Si no ha encontrado ninguna carta
+        if(infoCardsProv.length == 0)
+        {
+          postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
+        }
+        //Si ha encontrado más de 2 cartas que contenga ese nombre
+        else if(infoCardsProv.length > 2)
+        {
+          let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
+          if(infoCardsProv.length > 10)
+            aux += "Especifica más por favor."
+          else
+          {
+            aux += "Listado de cartas encontradas: "
+            infoCardsProv.forEach(element => {
+              aux += "'" + element [0] + "', "      
+            });
+            //Quitamos la coma y el espacio final
+            aux.substring(0, aux.length - 2)
+          }
+          postMessage(message, aux, res)
+        }
+        else
+        {
+          infoCardsProv.forEach(element => {
+            sendPhoto(message, element[1], res)
+          });
+        
+        }
       }
     }
   } catch (error) {
@@ -147,6 +150,7 @@ function sendPhoto(message, result, res)
 
 // Finally, start our server
 app.listen(3000, function() {
+  Database.buildDatabase()
   console.log('Telegram app listening on port 3000!')
 })
 
