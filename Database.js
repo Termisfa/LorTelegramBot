@@ -21,7 +21,23 @@ class Database
           });
         return infoCardsProv
     }
+    static searchCardById(cardId)
+    {
+        //Con for, porque foreach no admite breaks ni returns
+        for(var i = 0; i < allCardsInfo.length; i++)
+        {
+            if(allCardsInfo[i].cardCode === cardId)
+                return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs)
+        }
+    }
 }
 
 module.exports = Database
 
+/*
+//Para tests
+app.listen(3000, function() {
+    console.log(Database.searchCardById('01PZ040T2'))
+    console.log('Telegram app listening on port 3000!')
+  })
+*/
