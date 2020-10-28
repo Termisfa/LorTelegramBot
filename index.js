@@ -106,25 +106,24 @@ app.post('/', function(req, res) {
 function mergeAndDeleteImgs(promisesArrayProv)
 {
   try {
-    
-
-  var txtOut = 'out.png'
-  Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
-    .then((img) => {
-      img.write(txtOut, () => {
-        console.log('done3')
-        /*
-        values.forEach(element => {
-          fs.unlinkSync(element)
-        });              
-        */                                      
-      });
-  })})
-  return txtOut
+    var txtOut = 'out.png'
+    Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
+      .then((img) => {
+        img.write(txtOut, () => {
+          console.log('done3')
+          /*
+          values.forEach(element => {
+            fs.unlinkSync(element)
+          });              
+          */                                      
+        });
+    })})
+    return txtOut
 
   } catch (error) {
     console.log("Error en mergeImg")
     console.log(error)
+    return null
   }
 }
 
@@ -161,6 +160,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
   } catch (error) {
     console.log("Error en checkCorrectName")
     console.log(error)
+    return null
   }
 }
 
@@ -226,6 +226,20 @@ function sendPhoto(message, result, res)
 
 // Finally, start our server
 app.listen(3000, function() {
+  /*
+  var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png')
+  var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', './image1.png')
+  let promisesArrayProv = []
+  promisesArrayProv.push(promise1)
+  promisesArrayProv.push(promise2)
+
+  Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
+    .then((img) => {
+      img.write('out.png', () => {
+        console.log('done3')                                                        
+      });
+  })})
+  */
   console.log('Telegram app listening on port 3000!')
 })
 
