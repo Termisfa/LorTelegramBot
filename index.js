@@ -99,6 +99,7 @@ app.post('/', function(req, res) {
         }
       }
     }
+    console.log("Aqui")
   } catch (error) {
     console.log("Error en app.post")
     console.log(error)
@@ -137,7 +138,6 @@ function mergeAndDeleteImgs(promisesArrayProv)
 function checkCorrectName(infoCardsProv, msgReceived, res, message)
 {
   try { 
-    console.log("Cartas encontradas: " + infoCardsProv.length)
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
