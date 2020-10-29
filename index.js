@@ -177,6 +177,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 function postMessage(message, result, res)
 {
   try {  
+    console.log(res)
     console.log(result) 
     axios
     .post(
@@ -189,7 +190,7 @@ function postMessage(message, result, res)
     .then(response => {
       // We get here if the message was successfully posted
       console.log('Entra en respuesta texto OK')
-      console.log('Respuesta de telegram: ' + response)
+      console.log('Respuesta de telegram: ' + response.info)
       res.end('ok')
     })
     .catch(err => {
