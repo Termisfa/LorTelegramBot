@@ -149,7 +149,7 @@ function test(message, res)
                   console.log("Imagen guardada")
                   const form = new FormData()                                                  
                   form.append('image', img.bitmap.data);
-                  sendPhoto(message, form, res)
+                  sendPhoto(message, img.bitmap.data, res)
     
   })
 } 
