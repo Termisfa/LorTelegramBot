@@ -36,6 +36,7 @@ const download = (url, path) => {
 app.post('/', function(req, res) {
   try {     
     const { message } = req.body
+    console.log(message.text)
 
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
