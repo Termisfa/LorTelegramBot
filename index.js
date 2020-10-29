@@ -18,7 +18,6 @@ bodyParser.urlencoded({
 
 //Código necesario para descargar
 const mergeImg = require('merge-img')
-
 const fs = require('fs')
 const request = require('request')
 
@@ -37,6 +36,13 @@ app.post('/', function(req, res) {
     const { message } = req.body
 
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
+
+    //Para test, borrar al final
+    if(message.text == 1)
+    {
+      test(message, res)
+    }
+
 
     var botActivator = 'bot '
     
@@ -127,6 +133,14 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
     console.log(error)
   }
   return false
+}
+
+
+//Función para hacer tests, borrar cuando esté terminado
+function test(message, res)
+{
+  var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png') 
+  Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
 }
 
 //Si entra en demasiados res.end(), hace que vayan las respuestas con delay
