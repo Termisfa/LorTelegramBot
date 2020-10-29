@@ -189,7 +189,7 @@ function postMessage(message, result, res)
     .then(response => {
       // We get here if the message was successfully posted
       console.log('Entra en respuesta texto OK')
-      console.log('Respuesta de telegram: ' + JSON.stringify(response))
+      console.log('Respuesta de telegram: ' + JSON.stringify(response._httpMessage))
       res.end('ok')
     })
     .catch(err => {
