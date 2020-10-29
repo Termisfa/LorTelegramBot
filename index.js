@@ -145,7 +145,7 @@ function test(message, res)
     mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
                                                 .then((img) => { 
                                                   console.log("Imagen guardada")
-                                                  sendPhoto(message, img, res)
+                                                  postMessage(message, img, res)
                                                 })
     
   } 
