@@ -130,7 +130,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
   return false
 }
 
-
+//Si entra en demasiados res.end(), hace que vayan las respuestas con delay
 //Para mandar un mensaje
 function postMessage(message, result, res)
 {
