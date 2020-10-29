@@ -146,7 +146,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
       postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
       return false
     }
-    //Si ha encontrado más de 2 cartas que contenga ese nombre
+    //Si ha encontrado más de 5 cartas que contenga ese nombre
     else if(infoCardsProv.length > 5)
     {
       let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
@@ -161,6 +161,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
         //Quitamos la coma y el espacio final
         aux.substring(0, aux.length - 2)
       }
+      console.log(aux)
       postMessage(message, aux, res)
       return false
     }
