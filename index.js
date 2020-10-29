@@ -21,13 +21,12 @@ const mergeImg = require('merge-img')
 
 const fs = require('fs')
 const request = require('request')
-const { info } = require('console')
 
 const download = (url, path) => {
   return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
     request(url)
       .pipe(fs.createWriteStream(path))
-      .on('close', () => resolve(path))
+      .on('close', () => resolve(console.log(path + " creada")))
   }) })
 }
 
@@ -73,30 +72,16 @@ app.post('/', function(req, res) {
 
       } 
 
-      //No lleva la palabra rel
       else
       {      
-        let infoCardsProv = Database.searchCardByName(msgReceived)       
+        let infoCardsProv = Database.searchCardByName(msgReceived)
+        
 
-        if(checkCorrectName(infoCardsProv, msgReceived, res, message))
+        if(checkCorrectName)
         {
-          //Si solo hay una coincidencia, simplemente la envía
-          if(infoCardsProv.length == 1)
-            sendPhoto(message, infoCardsProv[0].imageUrl, res)
-          //Si hay varias coincidencias, entrar a merge
-          else
-          {  
-            var promisesArrayProv = []
-            /*   
-            infoCardsProv.forEach(element => {
-              promisesArrayProv.push(download(element.imageUrl,"./" + element.code + ".png"))
-            });           
-                  
-            var imagePath = mergeAndDeleteImgs(promisesArrayProv)
-            sendPhoto(message, imagePath, res)
-            */
-            console.log(infoCardsProv[0])
-          }
+          infoCardsProv.forEach(element => {
+            sendPhoto(message, element.imageUrl, res)
+          });        
         }
       }
     }
@@ -105,47 +90,21 @@ app.post('/', function(req, res) {
     console.log(error)
     res.end()
   }  
-  res.end()
 })
 
-
-//Merge imagen, y borrado de las auxiliares. Devuelve ruta a enviar
-function mergeAndDeleteImgs(promisesArrayProv)
+//Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
+function checkCorrectName(infoCardsProv, msgReceived, res)
 {
   try {
-    var txtOut = 'out.png'
-    Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
-      .then((img) => {
-        img.write(txtOut, () => {
-          console.log('done3')
-          /*
-          values.forEach(element => {
-            fs.unlinkSync(element)
-          });              
-          */                                      
-        });
-    })})
-    return txtOut
-
-  } catch (error) {
-    console.log("Error en mergeImg")
-    console.log(error)
-    return null
-  }
-}
-
-
-//Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
-function checkCorrectName(infoCardsProv, msgReceived, res, message)
-{
-  try { 
+    
+  
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
       postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
       return false
     }
-    //Si ha encontrado más de 5 cartas que contenga ese nombre
+    //Si ha encontrado más de 2 cartas que contenga ese nombre
     else if(infoCardsProv.length > 5)
     {
       let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
@@ -168,7 +127,6 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
   } catch (error) {
     console.log("Error en checkCorrectName")
     console.log(error)
-    return null
   }
 }
 
@@ -176,8 +134,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 //Para mandar un mensaje
 function postMessage(message, result, res)
 {
-  try {  
-    console.log(result) 
+  try {   
     axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
@@ -189,6 +146,7 @@ function postMessage(message, result, res)
     .then(response => {
       // We get here if the message was successfully posted
       console.log('Entra en respuesta texto OK')
+      console.log('Respuesta de telegram: ' + response.ok)
       res.end('ok')
     })
     .catch(err => {
@@ -234,21 +192,5 @@ function sendPhoto(message, result, res)
 
 // Finally, start our server
 app.listen(3000, function() {
-  /*
-
-  var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png')
-  var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', './image1.png')
-  let promisesArrayProv = []
-  promisesArrayProv.push(promise1)
-  promisesArrayProv.push(promise2)
-
-  Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
-    .then((img) => {
-      img.write('out.png', () => {
-        console.log('done3')                                                        
-      });
-  })})
-  */
   console.log('Telegram app listening on port 3000!')
 })
-
