@@ -142,7 +142,7 @@ function test(message, res)
 {
   try {   
 
-    var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png') 
+    var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './rsc/image.png') 
     Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
   } 
   catch (error) {
