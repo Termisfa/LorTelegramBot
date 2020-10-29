@@ -43,6 +43,9 @@ app.post('/', function(req, res) {
     //  test(message, res)
     //  return
     //}
+    fs.chmod("./rsc", 0666, (error) => {
+      console.log('Changed file permissions');
+    })
 
 
     var botActivator = 'bot '
