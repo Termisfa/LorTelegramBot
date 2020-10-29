@@ -77,7 +77,7 @@ app.post('/', function(req, res) {
         let infoCardsProv = Database.searchCardByName(msgReceived)
         
 
-        if(checkCorrectName)
+        if(checkCorrectName(infoCardsProv, msgReceived, res))
         {
           infoCardsProv.forEach(element => {
             sendPhoto(message, element.imageUrl, res)
