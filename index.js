@@ -38,6 +38,7 @@ app.post('/', function(req, res) {
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
     //Para test, borrar al final
+    console.log(message.chat_id)
     if(message.text == 1)
     {
       test(message, res)
@@ -151,7 +152,7 @@ function test(message, res)
   } 
   catch (error) {
     console.log("Error en test")
-    //console.log(error)
+    console.log(error)
     res.end()
   }
 }
@@ -182,7 +183,7 @@ function postMessage(message, result, res)
     })
   } catch (error) {
     console.log("Error en postMessage")
-    //console.log(error)
+    console.log(error)
     res.end()
   }
 }
