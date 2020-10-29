@@ -97,6 +97,7 @@ app.post('/', function(req, res) {
 function checkCorrectName(infoCardsProv, msgReceived, res, message)
 {
   try {  
+    console.log(infoCardsProv)
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
