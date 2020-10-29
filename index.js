@@ -39,11 +39,13 @@ app.post('/', function(req, res) {
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
     //Para test, borrar al final
+    /*
     if(message.text == 1)
     {
       test(message, res)
       return
     }
+    */
 
 
 
