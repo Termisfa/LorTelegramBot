@@ -141,6 +141,9 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 function test(message, res)
 {
   try {   
+    fs.chmod("./rsc", 0666, (error) => {
+      console.log('Changed file permissions');
+    })
 
     var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './rsc/image.png') 
     Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
