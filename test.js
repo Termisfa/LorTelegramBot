@@ -1,5 +1,3 @@
-
-
 const mergeImg = require('merge-img')
 
 const fs = require('fs')
@@ -8,16 +6,15 @@ const request = require('request')
 const download = (url, path) => {
   return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
     request(url)
-      .pipe(aux)
-      .on('close', () => resolve(aux))
+      .pipe(fs.createWriteStream(path))
+      .on('close', () => resolve(path))
   }) })
 }
 
-var aux, aux2
 
-var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', aux)
+var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png')
 
-var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', aux2)
+var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', './image1.png')
 
 let promisesArrayProv = []
 promisesArrayProv.push(promise1)
