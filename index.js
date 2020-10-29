@@ -41,6 +41,7 @@ app.post('/', function(req, res) {
     if(message.text == 1)
     {
       test(message, res)
+      return
     }
 
 
@@ -139,8 +140,13 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 //Función para hacer tests, borrar cuando esté terminado
 function test(message, res)
 {
+  try {   
   var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png') 
   Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
+} catch (error) {
+  console.log("Error en test")
+  console.log(error)
+}
 }
 
 //Si entra en demasiados res.end(), hace que vayan las respuestas con delay
@@ -207,3 +213,4 @@ function sendPhoto(message, result, res)
 app.listen(3000, function() {
   console.log('Telegram app listening on port 3000!')
 })
+
