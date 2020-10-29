@@ -95,8 +95,7 @@ app.post('/', function(req, res) {
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
 function checkCorrectName(infoCardsProv, msgReceived, res, message)
 {
-  try {  
-    console.log(infoCardsProv)
+  try { 
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
