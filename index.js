@@ -39,7 +39,6 @@ app.post('/', function(req, res) {
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
     //Para test, borrar al final
-    console.log(message.chat.id)
     if(message.text == 1)
     {
       test(message, res)
@@ -148,8 +147,8 @@ function test(message, res)
                 .then((img) => { 
                   console.log("Imagen guardada")
                   const form = new FormData()                                                  
-                  form.append('image', img.bitmap.data);
-                  sendPhoto(message, img.bitmap, res)
+                  form.append('image', img.bitmap);
+                  sendPhoto(message, form, res)
     
   })
 } 
