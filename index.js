@@ -151,7 +151,7 @@ function test(message, res)
   } 
   catch (error) {
     console.log("Error en test")
-    console.log(error)
+    //console.log(error)
     res.end()
   }
 }
