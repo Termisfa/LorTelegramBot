@@ -141,12 +141,18 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 function test(message, res)
 {
   try {   
-  var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png') 
-  Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
-} catch (error) {
-  console.log("Error en test")
-  console.log(error)
-}
+    fs.chmod('./', 0666, (error) => {
+      console.log('Changed file permissions')
+      console.log(error)
+    })
+
+    var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png') 
+    Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
+  } 
+  catch (error) {
+    console.log("Error en test")
+    console.log(error)
+  }
 }
 
 //Si entra en demasiados res.end(), hace que vayan las respuestas con delay
