@@ -90,7 +90,6 @@ app.post('/', function(req, res) {
     console.log(error)
     res.end()
   }  
-  res.end()
 })
 
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
