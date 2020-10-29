@@ -90,21 +90,20 @@ app.post('/', function(req, res) {
     console.log(error)
     res.end()
   }  
+  res.end()
 })
 
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
 function checkCorrectName(infoCardsProv, msgReceived, res)
 {
-  try {
-    
-  
+  try {  
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
       postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
       return false
     }
-    //Si ha encontrado más de 2 cartas que contenga ese nombre
+    //Si ha encontrado más de 5 cartas que contenga ese nombre
     else if(infoCardsProv.length > 5)
     {
       let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
@@ -128,6 +127,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res)
     console.log("Error en checkCorrectName")
     console.log(error)
   }
+  return false
 }
 
 
