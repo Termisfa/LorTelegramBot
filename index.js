@@ -182,7 +182,7 @@ function postMessage(message, result, res)
     })
   } catch (error) {
     console.log("Error en postMessage")
-    console.log(error)
+    //console.log(error)
     res.end()
   }
 }
