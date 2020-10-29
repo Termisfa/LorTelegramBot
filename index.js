@@ -77,7 +77,7 @@ app.post('/', function(req, res) {
         let infoCardsProv = Database.searchCardByName(msgReceived)
         
 
-        if(checkCorrectName(infoCardsProv, msgReceived, res))
+        if(checkCorrectName(infoCardsProv, msgReceived, res, message))
         {
           infoCardsProv.forEach(element => {
             sendPhoto(message, element.imageUrl, res)
@@ -94,7 +94,7 @@ app.post('/', function(req, res) {
 })
 
 //Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
-function checkCorrectName(infoCardsProv, msgReceived, res)
+function checkCorrectName(infoCardsProv, msgReceived, res, message)
 {
   try {  
     //Si no ha encontrado ninguna carta
