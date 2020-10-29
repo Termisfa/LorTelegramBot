@@ -37,13 +37,13 @@ app.post('/', function(req, res) {
 
     //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
 
-    /*//Para test, borrar al final
+    //Para test, borrar al final
     if(message.text == 1)
     {
       test(message, res)
       return
     }
-    */
+
 
     var botActivator = 'bot '
     
@@ -141,10 +141,6 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 function test(message, res)
 {
   try {   
-    fs.chmod('./', 0666, (error) => {
-      console.log('Changed file permissions')
-      console.log(error)
-    })
 
     var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png') 
     Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
