@@ -161,7 +161,6 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
         //Quitamos la coma y el espacio final
         aux.substring(0, aux.length - 2)
       }
-      console.log(aux)
       postMessage(message, aux, res)
       return false
     }
@@ -178,7 +177,8 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 //Para mandar un mensaje
 function postMessage(message, result, res)
 {
-  try {   
+  try {  
+    console.log(result) 
     axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
