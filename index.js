@@ -145,30 +145,30 @@ function test(message, res)
 {
   try {   
     mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
-                                                .then((img) => { 
-                                                  console.log("Imagen guardada")
-                                                  const form = new FormData()                                                  
-                                                  form.append('image', img);
-                                                  //sendPhoto(message, form, res)
-                                                  form.post(
-                                                    'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
-                                                    {
-                                                      chat_id: message.chat.id,
-                                                      text: result
-                                                    }
-                                                  )
-                                                  .then(response => {
-                                                    // We get here if the message was successfully posted
-                                                    console.log('Entra en respuesta texto OK')
-                                                    console.log('Respuesta de telegram: ' + response.ok)
-                                                    res.end('ok')
-                                                  })
-                                                  .catch(err => {
-                                                    // ...and here if it was not
-                                                    console.log('Error :', err)
-                                                    res.end('Error :' + err)
-                                                  })
-                                                })
+                .then((img) => { 
+                  console.log("Imagen guardada")
+                  const form = new FormData()                                                  
+                  form.append('image', img.bitmap.data);
+                  //sendPhoto(message, form, res)
+                  form.post(
+                    'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
+                    {
+                      chat_id: message.chat.id,
+                      text: result
+                    }
+                  )
+                  .then(response => {
+                    // We get here if the message was successfully posted
+                    console.log('Entra en respuesta texto OK')
+                    console.log('Respuesta de telegram: ' + response.ok)
+                    res.end('ok')
+                  })
+                  .catch(err => {
+                    // ...and here if it was not
+                    console.log('Error :', err)
+                    res.end('Error :' + err)
+                  })
+                })
     
   } 
   catch (error) {

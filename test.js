@@ -27,7 +27,7 @@ mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https
                                                 .then((img) => {
                                                   img.write('out.png', () => {
                                                     console.log('done3')
-                                                    console.log(img)
+                                                    console.log(img.bitmap.data)
                                                     });                                                    
                                                   });
                                                   
