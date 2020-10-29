@@ -4,6 +4,7 @@ var bodyParser = require('body-parser')
 const axios = require('axios')
 var Database = require('./Database')
 var CardInfo = require('./CardInfo')
+const mergeImg = require('merge-img')
 'use strict'
 
 
@@ -17,7 +18,6 @@ bodyParser.urlencoded({
 
 
 //Código necesario para descargar
-const mergeImg = require('merge-img')
 const fs = require('fs')
 const request = require('request')
 
@@ -40,9 +40,6 @@ app.post('/', function(req, res) {
     //Para test, borrar al final
     if(message.text == 1)
     {
-      fs.chmod("./rsc", 0666, (error) => {
-        console.log('Changed file permissions');
-      })
       test(message, res)
       return
     }
@@ -145,9 +142,12 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
 function test(message, res)
 {
   try {   
-
-    var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './rsc/image.png') 
-    Promise.all([promise1]).then( (values) => { sendPhoto(message, values[0], res)})
+    mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
+                                                .then((img) => { 
+                                                  console.log("Imagen guardada")
+                                                  sendPhoto(message, img, res)
+                                                })
+    
   } 
   catch (error) {
     console.log("Error en test")

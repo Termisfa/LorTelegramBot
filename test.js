@@ -11,7 +11,7 @@ const download = (url, path) => {
   }) })
 }
 
-
+/*
 var promise1 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', './image.png')
 
 var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png', './image1.png')
@@ -19,20 +19,18 @@ var promise2 = download('https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT00
 let promisesArrayProv = []
 promisesArrayProv.push(promise1)
 promisesArrayProv.push(promise2)
+*/
 
 
 
-
-Promise.all(promisesArrayProv).then( (values) => { mergeImg(values)
+mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
                                                 .then((img) => {
                                                   img.write('out.png', () => {
                                                     console.log('done3')
-                                                    values.forEach(element => {
-                                                      fs.unlinkSync(element)
+                                                    console.log(img)
                                                     });                                                    
                                                   });
-})})
-
+                                                  
 
 //Ejemplo de download + merge funcional
 /*
