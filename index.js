@@ -101,8 +101,7 @@ function checkCorrectName(infoCardsProv, msgReceived, res, message)
     //Si no ha encontrado ninguna carta
     if(infoCardsProv.length == 0)
     {
-      postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)
-      console.log("despues de postMessage")
+      postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)      
       return false
     }
     //Si ha encontrado más de 5 cartas que contenga ese nombre
