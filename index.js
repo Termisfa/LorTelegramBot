@@ -156,7 +156,7 @@ function test(message, res)
                 
                 formData.append('prueba.png', buffer);
                 
-                sendPhoto(message, buffer, res)
+                sendPhoto(message, formData, res)
               });  
                   
     
