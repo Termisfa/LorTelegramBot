@@ -176,7 +176,7 @@ function sendPhotoTest(message, result, res)
     console.log(result.getHeaders())
     axios
     .post(
-      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/inputFile',
+      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/InputFile',
       {
         chat_id: message.chat.id,
         photo: result,       
