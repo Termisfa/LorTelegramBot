@@ -6,6 +6,9 @@ var Database = require('./Database')
 var CardInfo = require('./CardInfo')
 const mergeImg = require('merge-img')
 var Jimp = require('jimp');
+const FormData = require('form-data');
+const formData = new FormData();
+
 'use strict'
 
 
@@ -146,12 +149,15 @@ function test(message, res)
 {
   try {   
     mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
-                .then((img) => { 
-                  console.log("Imagen guardada")
-                  img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                    //res.writeHead(200, { 'content-type': 'multipart/form-data' });
-                    sendPhoto(message, buffer, res)
-                  });  
+            .then((img) => { 
+              console.log("Imagen guardada")
+              img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+                //res.writeHead(200, { 'content-type': 'multipart/form-data' });
+                
+                formData.append('prueba.png', buffer);
+                
+                sendPhoto(message, buffer, res)
+              });  
                   
     
   })
@@ -173,7 +179,8 @@ function postMessage(message, result, res)
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
       {
         chat_id: message.chat.id,
-        text: result
+        text: result,
+        headers: formData.getHeaders()
       }
     )
     .then(response => {
