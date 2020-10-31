@@ -5,7 +5,7 @@ const axios = require('axios')
 var Database = require('./Database')
 var CardInfo = require('./CardInfo')
 const mergeImg = require('merge-img')
-var FormData = require('form-data');
+var Jimp = require('jimp');
 'use strict'
 
 
@@ -148,9 +148,10 @@ function test(message, res)
     mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
                 .then((img) => { 
                   console.log("Imagen guardada")
-                  const form = new FormData()                                                  
-                  form.append('image', img.bitmap);
-                  sendPhoto(message, form, res)
+                  img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+                    sendPhoto(message, buffer, res)
+                  });  
+                  
     
   })
 } 
