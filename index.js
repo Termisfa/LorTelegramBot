@@ -149,6 +149,7 @@ function test(message, res)
                 .then((img) => { 
                   console.log("Imagen guardada")
                   img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+                    res.writeHead(200, { 'content-type': 'multipart/form-data' });
                     sendPhoto(message, buffer, res)
                   });  
                   
