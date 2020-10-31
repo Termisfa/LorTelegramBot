@@ -149,7 +149,7 @@ function test(message, res)
                 .then((img) => { 
                   console.log("Imagen guardada")
                   img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                    res.writeHead(200, { 'content-type': 'multipart/form-data' });
+                    //res.writeHead(200, { 'content-type': 'multipart/form-data' });
                     sendPhoto(message, buffer, res)
                   });  
                   
@@ -204,8 +204,12 @@ function sendPhoto(message, result, res)
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
-        photo: result
+        photo: result,       
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       }
+      
     )
     .then(response => {
       // We get here if the message was successfully posted
