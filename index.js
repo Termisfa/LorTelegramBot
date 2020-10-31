@@ -192,7 +192,7 @@ function sendPhotoTest(message, result, res)
       //console.log('Error :', err)
       postMessage(message, err, res)
       console.log("Error en sendPhotoTest")
-      res.end('Error :' + err)
+      //res.end('Error :' + err)
     }) 
 }
 
