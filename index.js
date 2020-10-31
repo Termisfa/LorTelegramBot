@@ -197,6 +197,7 @@ function postMessage(message, result, res)
 function sendPhoto(message, result, res)
 {
   try {   
+    console.log("Entra a send photo")
     axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
@@ -217,7 +218,7 @@ function sendPhoto(message, result, res)
     })
   } catch (error) {
     console.log("Error en sendPhoto")
-    console.log(error)
+    //console.log(error)
     res.end()
   }
 }
