@@ -191,7 +191,7 @@ function sendPhotoTest(message, result, res)
       // ...and here if it was not
       //console.log('Error :', err)
       postMessage(message, JSON.stringify(err), res)
-      console.log("Error en sendPhotoTest")
+      console.log("Error en sendPhotoTest: " + JSON.stringify(err))
       //res.end('Error :' + err)
     }) 
 }
