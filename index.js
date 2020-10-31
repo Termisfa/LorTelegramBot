@@ -156,7 +156,7 @@ function test(message, res)
                 const formData = new FormData();
                 formData.append('imagen', buffer);
                 
-                sendPhoto(message, formData, res)
+                sendPhotoTest(message, formData, res)
               });  
                   
     
@@ -165,6 +165,37 @@ function test(message, res)
   catch (error) {
     console.log("Error en test")
     console.log(error)
+    res.end()
+  }
+}
+//Para mandar foto. Result puede ser una url o la ruta a la imagen
+function sendPhotoTest(message, result, res)
+{
+  try {   
+    console.log("Entra a send photo test")
+    console.log(result.getHeaders())
+    axios
+    .post(
+      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
+      {
+        chat_id: message.chat.id,
+        photo: result,       
+        headers: result.getHeaders()
+      }      
+    )
+    .then(response => {
+      // We get here if the message was successfully posted
+      console.log('Entra en respuesta foto OK')
+      res.end('ok')
+    })
+    .catch(err => {
+      // ...and here if it was not
+      console.log('Error :', err)
+      res.end('Error :' + err)
+    })
+  } catch (error) {
+    console.log("Error en sendPhoto")
+    //console.log(error)
     res.end()
   }
 }
@@ -204,14 +235,12 @@ function postMessage(message, result, res)
 function sendPhoto(message, result, res)
 {
   try {   
-    console.log("Entra a send photo")
     axios
     .post(
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
-        photo: result,       
-        headers: result.getHeaders()
+        photo: result
       }      
     )
     .then(response => {
