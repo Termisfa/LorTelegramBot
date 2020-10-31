@@ -176,7 +176,7 @@ function sendPhotoTest(message, result, res)
     console.log(result.getHeaders())
     axios
     .post(
-      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
+      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/multipart/form-data',
       {
         chat_id: message.chat.id,
         photo: result,       
@@ -194,7 +194,7 @@ function sendPhotoTest(message, result, res)
       res.end('Error :' + err)
     })
   } catch (error) {
-    console.log("Error en sendPhoto")
+    console.log("Error en sendPhotoTest")
     //console.log(error)
     res.end()
   }
