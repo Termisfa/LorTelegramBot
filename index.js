@@ -213,9 +213,9 @@ function sendPhoto(message, result, res)
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
-        photo: result.getHeaders(),       
+        photo: result,       
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': result.getHeaders()
         }
       }
       
