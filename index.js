@@ -164,7 +164,7 @@ function test(message, res)
 } 
   catch (error) {
     console.log("Error en test")
-    console.log(error)
+    //console.log(error)
     res.end()
   }
 }
@@ -176,7 +176,7 @@ function sendPhotoTest(message, result, res)
     console.log(result.getHeaders())
     axios
     .post(
-      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendDocument',
+      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
         photo: result,       
@@ -185,12 +185,13 @@ function sendPhotoTest(message, result, res)
     )
     .then(response => {
       // We get here if the message was successfully posted
-      console.log('Entra en respuesta foto OK')
+      console.log('Entra en respuesta foto test OK')
       res.end('ok')
     })
     .catch(err => {
       // ...and here if it was not
-      console.log('Error :', err)
+      //console.log('Error :', err)
+      console.log("Error en sendPhotoTest")
       res.end('Error :' + err)
     })
   } catch (error) {
