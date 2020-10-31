@@ -190,6 +190,7 @@ function sendPhotoTest(message, result, res)
     .catch(err => {
       // ...and here if it was not
       //console.log('Error :', err)
+      postMessage(message, err, res)
       console.log("Error en sendPhotoTest")
       res.end('Error :' + err)
     }) 
