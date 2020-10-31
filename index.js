@@ -179,10 +179,7 @@ function postMessage(message, result, res)
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
       {
         chat_id: message.chat.id,
-        text: result,
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+        text: result
       }
     )
     .then(response => {
@@ -214,11 +211,8 @@ function sendPhoto(message, result, res)
       {
         chat_id: message.chat.id,
         photo: result,       
-        headers: {
-          'Content-Type': result.getHeaders()
-        }
-      }
-      
+        headers: result.getHeaders()
+      }      
     )
     .then(response => {
       // We get here if the message was successfully posted
