@@ -7,7 +7,7 @@ var CardInfo = require('./CardInfo')
 const mergeImg = require('merge-img')
 var Jimp = require('jimp');
 const FormData = require('form-data');
-const formData = new FormData();
+
 
 'use strict'
 
@@ -153,8 +153,8 @@ function test(message, res)
               console.log("Imagen guardada")
               img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
                 //res.writeHead(200, { 'content-type': 'multipart/form-data' });
-                
-                formData.append('prueba.png', buffer);
+                const formData = new FormData();
+                formData.append('imagen', buffer);
                 
                 sendPhoto(message, formData, res)
               });  
@@ -180,7 +180,9 @@ function postMessage(message, result, res)
       {
         chat_id: message.chat.id,
         text: result,
-        headers: formData.getHeaders()
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       }
     )
     .then(response => {
@@ -211,7 +213,7 @@ function sendPhoto(message, result, res)
       'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
       {
         chat_id: message.chat.id,
-        photo: result,       
+        photo: result.getHeaders(),       
         headers: {
           'Content-Type': 'multipart/form-data'
         }
