@@ -170,8 +170,7 @@ function test(message, res)
 }
 //Para mandar foto. Result puede ser una url o la ruta a la imagen
 function sendPhotoTest(message, result, res)
-{
-  try {   
+{ 
     console.log("Entra a send photo test")
     console.log(result.getHeaders())
     axios
@@ -193,12 +192,7 @@ function sendPhotoTest(message, result, res)
       //console.log('Error :', err)
       console.log("Error en sendPhotoTest")
       res.end('Error :' + err)
-    })
-  } catch (error) {
-    console.log("Error en sendPhotoTest")
-    //console.log(error)
-    res.end()
-  }
+    }) 
 }
 
 //Si entra en demasiados res.end(), hace que vayan las respuestas con delay
