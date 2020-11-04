@@ -1,4 +1,5 @@
 const TelegramBot = require('node-telegram-bot-api');
+process
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
@@ -20,6 +21,8 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, resp);
 });
+
+
 
 // Listen for any kind of message. There are different kinds of
 // messages.
