@@ -74,7 +74,7 @@ function mergeImagesAndSend(chatId, cardList)
 function checkCorrectName(infoCardsProv, msgReceived, chatId)
 {
   try { 
-    //Si no ha encontrado ninguna carta
+    //Si no ha encontrado ninguna carta 
     if(infoCardsProv.length == 0)
     {
       bot.sendMessage(chatId, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'") 
