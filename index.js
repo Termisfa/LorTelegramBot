@@ -1,5 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api');
-process
+var Database = require('./Database')
+var CardInfo = require('./CardInfo')
+const mergeImg = require('merge-img')
+var Jimp = require('jimp');
+
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
@@ -7,33 +11,118 @@ const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
+//Listener para que enseñe errores de sintaxis
+bot.on("polling_error", console.log);
+
 // Matches "/echo [whatever]"
-bot.onText(/\/echo (.+)/, (msg, match) => {
+bot.onText(/\/carta (.+)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
   // of the message
 
-  
-  const chatId = msg.chat.id;
-  const resp = match[1]; // the captured "whatever"
-  console.log("echo "+ resp)
 
-  // send back the matched "whatever" to the chat
-  bot.sendMessage(chatId, resp);
+
+
+  let infoCardsProv = Database.searchCardByName(match[1])  
+
+  const chatId = msg.chat.id;
+  if(checkCorrectName(infoCardsProv, match[1], chatId))
+  {
+    //Si solo hay una coincidencia
+    if(infoCardsProv.length == 1)
+    {
+      infoCardsProv = getListByCardId(infoCardsProv[0])
+      mergeImagesAndSend(chatId, infoCardsProv)
+    }      
+    //Si hay varias
+    else
+    {
+      mergeImagesAndSend(chatId, infoCardsProv)
+    }   
+  }
 });
 
+//Busca cartas relacionadas con una y devuelve la lista
+function getListByCardId(card)
+{
+  let cardListImages = [] 
+  cardListImages.push(card)
+  //console.log(card.associatedCardRefs)
+  card.relatedCards.forEach(element => {
+    cardListImages.push(Database.searchCardById(element))
+  });   
+  return cardListImages
+}
+
+//Junta imagenes en una desde una lista de cartas y la manda
+function mergeImagesAndSend(chatId, cardList)
+{
+  let cardListImages = [] 
+
+  cardList.forEach(element => {
+    cardListImages.push(element.imageUrl)
+  });   
+
+  mergeImg(cardListImages)
+  .then((img) => { 
+    img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+      bot.sendPhoto(chatId, buffer)
+    });
+  })
+}
+
+function checkCorrectName(infoCardsProv, msgReceived, chatId)
+{
+  try { 
+    //Si no ha encontrado ninguna carta
+    if(infoCardsProv.length == 0)
+    {
+      bot.sendMessage(chatId, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'") 
+      return false
+    }
+    //Si ha encontrado más de 5 cartas que contenga ese nombre
+    else if(infoCardsProv.length > 5)
+    {
+      let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
+      if(infoCardsProv.length > 15)
+        aux += "Especifica más por favor."
+      else
+      {
+        aux += "Listado de cartas encontradas: "
+        infoCardsProv.forEach(element => {
+          aux += "'" + element.name + "', "      
+        });
+        //Quitamos la coma y el espacio final
+        aux.substring(0, aux.length - 2)
+      }
+      bot.sendMessage(chatId, aux)
+      return false
+    }
+    //Si todo es correcto
+    return true
+  } catch (error) {
+    console.log("Error en checkCorrectName")
+    console.log(error)
+  }
+  return false
+}
+
+function quitarAcentos(cadena){
+	const acentos = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
+	return cadena.split('').map( letra => acentos[letra] || letra).join('').toString();	
+}
 
 
+/*
 // Listen for any kind of message. There are different kinds of
 // messages.
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-
-
   console.log("echo en recibir mensaje")
   // send a message to the chat acknowledging receipt of their message
   bot.sendMessage(chatId, 'Received your message');
 });
+*/
 
 //BOT ANTIGUO
 /*

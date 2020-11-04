@@ -14,8 +14,10 @@ class Database
     static searchCardByName(cardName)
     {
         let infoCardsProv = []
+        cardName = cardName.toLowerCase()
+        cardName = removeAccents(cardName)
         allCardsInfo.forEach(card => {
-            if(card.name.toLowerCase().includes(cardName.toLowerCase()) && card.cardCode.length == 7)
+            if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
                 infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs))
             //infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
@@ -30,6 +32,11 @@ class Database
                 return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs)
         }
     }
+}
+
+function removeAccents(text){
+	const accentsList = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
+	return text.split('').map( char => accentsList[char] || char).join('').toString();	
 }
 
 module.exports = Database
