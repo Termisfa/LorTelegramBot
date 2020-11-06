@@ -1,8 +1,18 @@
 const TelegramBot = require('node-telegram-bot-api');
 var Database = require('./Database')
 var CardInfo = require('./CardInfo')
+
+//Para juntar imágenes
 const mergeImg = require('merge-img')
 var Jimp = require('jimp');
+
+//Para que funcione el DeckDecoder
+module.exports = {
+  DeckEncoder: require('./DeckDecoder/DeckEncoder'),
+  CardInDeck: require('./DeckDecoder/CardInDeck'),
+  Faction: require('./DeckDecoder/Faction')
+}
+const { DeckEncoder } = require('runeterra')
 
 
 // replace the value below with the Telegram token you receive from @BotFather
@@ -14,15 +24,21 @@ const bot = new TelegramBot(token, {polling: true});
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", console.log);
 
-// Matches "/echo [whatever]"
+//Para buscar decks
+bot.onText(/\/deck (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+
+  const deck = DeckEncoder.decode(match[1])
+  let aux = "Deck: \n"
+  deck.forEach(element => {
+    aux += "x"+ element.count + " " + Database.searchCardById(element.code).name + "\n"
+  });
+  bot.sendMessage(chatId, aux)
+});
+
+
+// Para buscar cartas
 bot.onText(/\/carta (.+)/, (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  // 'match' is the result of executing the regexp above on the text content
-  // of the message
-
-
-
-
   let infoCardsProv = Database.searchCardByName(match[1])  
 
   const chatId = msg.chat.id;
