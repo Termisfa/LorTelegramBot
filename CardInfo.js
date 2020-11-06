@@ -2,7 +2,7 @@
 
 module.exports = class CardInfo {
     constructor (cardCode, name, imageUrl, relatedCards) {
-      this.code = cardCode
+      this.cardCode = cardCode
       this.name = name
       this.imageUrl = imageUrl
       this.relatedCards = relatedCards

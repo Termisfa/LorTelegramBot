@@ -14,6 +14,11 @@ module.exports = {
 }
 const { DeckEncoder } = require('runeterra')
 
+//Para convertir html a imagen
+const nodeHtmlToImage = require('node-html-to-image')
+
+
+
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
@@ -23,6 +28,22 @@ const bot = new TelegramBot(token, {polling: true});
 
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", console.log);
+
+
+//Para hacer tests
+bot.onText(/\/t (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+
+  const promise = nodeHtmlToImage({
+    html: match[1]
+  });
+  promise.then((img) => {
+    //console.log(img)
+    bot.sendPhoto(chatId, img)
+  })
+  //console.log(img)
+  //bot.sendPhoto(chatId, img)
+});
 
 //Para buscar decks
 bot.onText(/\/deck (.+)/, (msg, match) => {
@@ -63,9 +84,11 @@ function getListByCardId(card)
 {
   let cardListImages = [] 
   cardListImages.push(card)
-  //console.log(card.associatedCardRefs)
   card.relatedCards.forEach(element => {
-    cardListImages.push(Database.searchCardById(element))
+    var newCard = Database.searchCardById(element)
+    //El if es para evitar que salga la misma carta en la imagen, como el caso de la crujivid que se referencia a sí misma
+    if(card.cardCode != newCard.cardCode)
+      cardListImages.push(newCard)
   });   
   return cardListImages
 }
