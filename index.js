@@ -20,6 +20,7 @@ const nodeHtmlToImage = require('node-html-to-image')
 
 
 
+
 // replace the value below with the Telegram token you receive from @BotFather
 const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
 
@@ -35,7 +36,8 @@ bot.onText(/\/t (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
 
   const promise = nodeHtmlToImage({
-    html: match[1]
+    html: match[1],
+    puppeteerArgs: { args: ['--no-sandbox'] } 
   });
   promise.then((img) => {
     //console.log(img)
@@ -146,10 +148,6 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
   return false
 }
 
-function quitarAcentos(cadena){
-	const acentos = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
-	return cadena.split('').map( letra => acentos[letra] || letra).join('').toString();	
-}
 
 
 /*
