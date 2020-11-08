@@ -18,7 +18,7 @@ class Database
         cardName = removeAccents(cardName)
         allCardsInfo.forEach(card => {
             if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
-                infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs))
+                infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, card.type))
             //infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
         return infoCardsProv
@@ -29,7 +29,7 @@ class Database
         for(var i = 0; i < allCardsInfo.length; i++)
         {
             if(allCardsInfo[i].cardCode === cardId)
-                return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs)
+                return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs, allCardsInfo[i].cost, allCardsInfo[i].type)
         }
     }
 }
