@@ -1,8 +1,8 @@
-const Faction = require('./Faction')
+const Database = require('../Database')
 
 module.exports = class CardInDeck {
   constructor (cardCode, count) {
-    this.code = cardCode
+    this.card = Database.searchCardById(cardCode)
     this.count = count
   }
 
@@ -19,9 +19,6 @@ module.exports = class CardInDeck {
     return parseInt(this.code.substring(0, 2))
   }
 
-  get faction () {
-    return Faction.fromCode(this.code.substring(2, 4))
-  }
 
   get id () {
     return parseInt(this.code.substring(4, 7))
