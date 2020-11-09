@@ -44,11 +44,24 @@ bot.onText(/\/deck (.+)/, (msg, match) => {
 
   var deck = DeckEncoder.decode(match[1])
   deck = Database.sortDeckByElixir(deck)
+  /*
   let aux = "Deck: \n"
   deck.forEach(element => {
     aux += "x"+ element.count + " " + element.card.name + "(" + element.card.elixirCost + ")" + "\n"
   });
   bot.sendMessage(chatId, aux)
+  */
+
+  
+
+  const promise = nodeHtmlToImage({
+    html: DeckImage.createDeckImage(deck),
+    puppeteerArgs: { args: ['--no-sandbox'] } 
+  });
+  promise.then((img) => {
+    //console.log(img)
+    bot.sendPhoto(chatId, img)
+  })
 });
 
 

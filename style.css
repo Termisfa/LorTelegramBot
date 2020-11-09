@@ -6,7 +6,7 @@
   
   /* Clear floats after the columns */
   .content:after {
-    content: "";
+    content: '';
     display: table;
     clear: both;
   }
@@ -29,8 +29,7 @@
     align-items: center;
     padding: 10px;
     border-radius: 6px;
-    color: rgb(255, 255, 255);
-    
+    color: rgb(255, 255, 255);    
 }
 
 .elixirCostBox {
@@ -90,6 +89,7 @@
 }
 
 .textQtyX {
+  margin-right: 5px;
   margin-top: 2px;
   font-size: 8px;
   font-weight: 700;

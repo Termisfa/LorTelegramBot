@@ -16,7 +16,7 @@ class Database
         cardName = removeAccents(cardName)
         allCardsInfo.forEach(card => {
             if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
-                infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, card.type))
+                infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
             //infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
           });
         return infoCardsProv
@@ -28,7 +28,7 @@ class Database
         for(var i = 0; i < allCardsInfo.length; i++)
         {
             if(allCardsInfo[i].cardCode === cardId)
-                return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs, allCardsInfo[i].cost, allCardsInfo[i].type)
+                return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs, allCardsInfo[i].cost, getTypeOfCard(allCardsInfo[i]))
         }
     }
     //Busca cartas relacionadas con una y devuelve la lista
@@ -65,6 +65,16 @@ class Database
     }
 }
 
+//Devuelve qué tipo de carta es
+function getTypeOfCard(card)
+{
+    if(card.rarityRef == "Champion")
+        return "Campeón"
+    else
+        return card.type
+}
+
+//Elimina los acentos de un string
 function removeAccents(text)
 {
     const accentsList = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
