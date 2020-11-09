@@ -1,6 +1,8 @@
 const { rejects } = require('assert');
 var fs = require('fs');
 const { resolve } = require('path');
+var ColorRegion = require('./ColorRegion')
+var colorRegion = ColorRegion.from()
 
 
 class DeckImage
@@ -15,12 +17,12 @@ class DeckImage
         htmlString += "</style></head>"
         htmlString += "<body><div class='content'>"
         htmlString += "<div class='column' id='column1'>"
-        htmlString += createDivChamps(deckList)
-        htmlString += createDivLandmarks(deckList)
+        htmlString += createDivChamps(deckList, "Campeón")
+        htmlString += createDivChamps(deckList, "Hito")
         htmlString += "</div><div class='column' id='column2'>"
-        htmlString += createDivFollowers(deckList)
+        htmlString += createDivChamps(deckList, "Unidad")
         htmlString += "</div><div class='column' id='column3'>"
-        htmlString += createDivSpells(deckList)
+        htmlString += createDivChamps(deckList, "Hechizo")
 
 
         htmlString += "</div></div></body></html>"
@@ -73,14 +75,21 @@ async function readFileCSS()
 
 
 //Devuelve el div completo en String de los campeones
-function createDivChamps(deckList)
+function createDivChamps(deckList, typeOfCard)
 {
-    var divString = "<div id='champs'><h1>Campeones</h1>"
+    var divString = ""
+    var count = 0
     deckList.forEach(cardInDeck => {
-        if(cardInDeck.card.cardType == "Campeón")
+        if(cardInDeck.card.cardType == typeOfCard)
+        {
             divString += createDivCard(cardInDeck)
+            count += cardInDeck.count
+        }
     });
     divString += "</div>"
+
+    //Agregamos al inicio de la cadena
+    divString = divString.replace(/^/, "<div><h1>" + selectNameForTitle(typeOfCard) + " " + count + "</h1>")
 
     return divString
 }
@@ -123,14 +132,26 @@ function createDivSpells(deckList)
 //Devuelve el div completo en String de una carta
 function createDivCard(cardInDeck)
 {
+    var color = colorRegion.getColorRgb(cardInDeck.card.cardCode.slice(2,4))
     var divString = "<div class='boxImg'>"
-    divString += "<div class='image' style='background: linear-gradient(90deg, rgb(90, 184, 218) 30%, rgba(90, 184, 218, 0) 70%), url(https://cdn-lor.mobalytics.gg/production/images/cards-preview/" + cardInDeck.card.cardCode + ".webp) right center no-repeat;'>"
+    divString += "<div class='image' style='background: linear-gradient(90deg, rgb(" + color + ") 30%, rgba(" + color + ", 0) 70%), url(https://cdn-lor.mobalytics.gg/production/images/cards-preview/" + cardInDeck.card.cardCode + ".webp) right center no-repeat;'>"
     divString += "<div class='elixirCostBox'><span class='elixirCost'>" + cardInDeck.card.elixirCost + "</span></div>"
     divString += "<span class='cardName'>" + cardInDeck.card.name + "</span>"
     divString += "<div class='boxOutQty'><div class='boxInQty'><span class='textQtyX'>X</span><p class='textQty'>" + cardInDeck.count + "</p></div></div>"
     divString += "</div></div>"
 
     return divString
+}
+
+function selectNameForTitle(typeOfCard)
+{
+    switch(typeOfCard)
+    {
+        case "Campeón": return "Campeones"
+        case "Hito": return "Hitos"
+        case "Unidad": return "Adeptos"
+        case "Hechizo": return "Hechizos"
+    }
 }
 
 
