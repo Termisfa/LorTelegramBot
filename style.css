@@ -30,7 +30,7 @@
     padding: 10px;
     border-radius: 6px;
     color: rgb(255, 255, 255);
-    background: linear-gradient(90deg, rgb(90, 184, 218) 30%, rgba(90, 184, 218, 0) 70%), url(https://cdn-lor.mobalytics.gg/production/images/cards-preview/01FR038.webp) right center no-repeat;
+    
 }
 
 .elixirCostBox {
