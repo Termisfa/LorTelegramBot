@@ -1,3 +1,5 @@
+const msgError = "InvalidDeck"
+
 class Faction {
   constructor (code, id) {
     this.shortCode = code
@@ -8,7 +10,8 @@ class Faction {
     const factionId = Faction.FACTIONS[code]
 
     if (factionId === undefined) {
-      throw new TypeError('Invalid faction code. It is possible you need to upgrade the runeterra package.')
+      console.log('Invalid faction code. It is possible you need to upgrade the runeterra package.')
+      return msgError
     }
 
     return new this(code, factionId)
@@ -18,7 +21,8 @@ class Faction {
     const [shortCode, factionId] = Object.entries(Faction.FACTIONS).find(([shortCode, factionId]) => factionId === id) || []
 
     if (factionId === undefined) {
-      throw new TypeError('Invalid faction id. It is possible you need to upgrade the runeterra package.')
+      console.log('Invalid faction id. It is possible you need to upgrade the runeterra package.')
+      return msgError
     }
 
     return new this(shortCode, factionId)

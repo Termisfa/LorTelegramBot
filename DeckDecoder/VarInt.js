@@ -1,3 +1,5 @@
+const msgError = "InvalidDeck"
+
 class VarInt {
   static pop (bytes) {
     let result = 0
@@ -16,7 +18,8 @@ class VarInt {
       currentShift += 7
     }
 
-    throw new TypeError('Byte array did not contain valid varints.')
+    console.log('Byte array did not contain valid varints.')
+    return msgError
   }
 
   static get (value) {

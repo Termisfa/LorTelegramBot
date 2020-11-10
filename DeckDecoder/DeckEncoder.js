@@ -2,6 +2,7 @@ const Base32 = require('./Base32')
 const VarInt = require('./VarInt')
 const CardInDeck = require('./CardInDeck')
 const Faction = require('./Faction')
+const msgError = "InvalidDeck"
 
 class DeckEncoder {
   static decode (code) {
@@ -11,26 +12,33 @@ class DeckEncoder {
     try {
       bytes = Base32.decode(code)
     } catch (e) {
-      throw new TypeError('Invalid deck code')
+      console.log('Invalid deck code')
+      return msgError
     }
 
     const firstByte = bytes.shift()
     const version = firstByte & 0xF
 
     if (version > DeckEncoder.MAX_KNOWN_VERSION) {
-      throw new TypeError('The provided code requires a higher version of this library; please update.')
+      console.log('The provided code requires a higher version of this library; please update.')
+      return msgError
     }
 
     for (let i = 3; i > 0; i--) {
       const numGroupOfs = VarInt.pop(bytes)
+      if(numGroupOfs == msgError)
+        return msgError
 
       for (let j = 0; j < numGroupOfs; j++) {
         const numOfsInThisGroup = VarInt.pop(bytes)
         const set = VarInt.pop(bytes)
         const faction = VarInt.pop(bytes)
+        
 
         for (let k = 0; k < numOfsInThisGroup; k++) {
           const card = VarInt.pop(bytes)
+          if(card == msgError)
+            return msgError
 
           const setString = set.toString().padStart(2, '0')
           const factionString = Faction.fromID(faction).shortCode
@@ -50,6 +58,8 @@ class DeckEncoder {
       const fourPlusSetString = fourPlusSet.toString().padStart(2, '0')
       const fourPlusFactionString = Faction.fromID(fourPlusFaction).shortCode
       const fourPlusNumberString = fourPlusNumber.toString().padStart(3, '0')
+      if(fourPlusCount == msgError || fourPlusSet == msgError || fourPlusFaction == msgError || fourPlusNumber == msgError || fourPlusSetString == msgError || fourPlusFactionString == msgError || fourPlusNumberString == msgError )
+        return msgError
 
       result.push(CardInDeck.from(fourPlusSetString, fourPlusFactionString, fourPlusNumberString, fourPlusCount))
     }
@@ -59,7 +69,8 @@ class DeckEncoder {
 
   static encode (cards) {
     if (!this.isValidDeck(cards)) {
-      throw new TypeError('The deck provided contains invalid card codes')
+      console.log('The deck provided contains invalid card codes')
+      return msgError
     }
 
     const grouped3 = this.groupByFactionAndSetSorted(cards.filter(c => c.count === 3))

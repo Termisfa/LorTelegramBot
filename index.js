@@ -21,52 +21,97 @@ const bot = new TelegramBot(token, {polling: true});
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", console.log);
 
-
+/*
 //Para hacer tests
-bot.onText(/\/t (.+)/, (msg, match) => {
+bot.onText(/^\/t (.+)/, (msg, match) => {
   const chatId = msg.chat.id;
+  const opts = [
+    {command: 'eat', description: 'Command for eat'},
+    {command: 'run', description: 'Command for run'},
+    {command: 'run', description: 'Command for run'}
+   ];
+   
+   bot.setMyCommands(opts).then(function (info) {
+       console.log(info)
+     });;
+  //console.log(bot.getMyCommands())
+});
+*/
 
-  const promise = nodeHtmlToImage({
-    html: match[1],
-    puppeteerArgs: { args: ['--no-sandbox'] } 
-  });
-  promise.then((img) => {
-    //console.log(img)
-    bot.sendPhoto(chatId, img)
-  })
-  //console.log(img)
-  //bot.sendPhoto(chatId, img)
+//Comando para info
+bot.onText(/^\/info$/, (msg) => {  
+  const chatId = msg.chat.id;
+  var aux = "*Listado de comandos:* \n"
+  aux += "`!Deck code`: Muestra imagen de un deck \n"
+  aux += "`!Carta nombre`: Muestra carta buscada \n"
+  bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
+});
+
+
+//Comandos para buscar decks
+bot.onText(/^\!Deck (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+bot.onText(/^\!deck (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+bot.onText(/^\!D (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+bot.onText(/^\!d (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
 });
 
 //Para buscar decks
-bot.onText(/\/deck (.+)/, (msg, match) => {
+function searchDeckCommand(msg, match)
+{
   const chatId = msg.chat.id;
 
   var deck = DeckEncoder.decode(match[1])
-  deck = Database.sortDeckByElixir(deck)
-  /*
-  let aux = "Deck: \n"
-  deck.forEach(element => {
-    aux += "x"+ element.count + " " + element.card.name + "(" + element.card.elixirCost + ")" + "\n"
-  });
-  bot.sendMessage(chatId, aux)
-  */
+  if(deck == "InvalidDeck" || !deck)
+    bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+  else
+  {
+    try
+    {
+      deck = Database.sortDeckByElixir(deck)   
 
-  
+      const promise = nodeHtmlToImage({
+        html: DeckImage.createDeckImage(deck),
+        puppeteerArgs: { args: ['--no-sandbox'] } 
+      });
+      promise.then((img) => {
+        //console.log(img)
+        bot.sendPhoto(chatId, img)
+      })
+    }
+    catch(error)
+    {
+      bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+    }
+    
+  }
 
-  const promise = nodeHtmlToImage({
-    html: DeckImage.createDeckImage(deck),
-    puppeteerArgs: { args: ['--no-sandbox'] } 
-  });
-  promise.then((img) => {
-    //console.log(img)
-    bot.sendPhoto(chatId, img)
-  })
+}
+
+
+//Comandos para buscar cartas
+bot.onText(/^\!Carta (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+bot.onText(/^\!carta (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+bot.onText(/^\!C (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+bot.onText(/^\!c (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
 });
 
-
 // Para buscar cartas
-bot.onText(/\/carta (.+)/, (msg, match) => {
+function searchCardCommand(msg, match)
+{
   let infoCardsProv = Database.searchCardByName(match[1])  
 
   const chatId = msg.chat.id;
@@ -84,9 +129,22 @@ bot.onText(/\/carta (.+)/, (msg, match) => {
       mergeImagesAndSend(chatId, infoCardsProv)
     }   
   }
+}
+
+
+//Actualizar comandos
+bot.onText(/^\!updateCommands/, (msg) => {  
+  const chatId = msg.chat.id;
+  const opts = [
+    {command: 'info', description: 'Info sobre comandos'}
+   ];
+   console.log(opts)
+   
+   bot.setMyCommands(opts).then( () => {
+       bot.sendMessage(chatId, "Comandos actualizados")
+     });
+  //console.log(bot.getMyCommands())
 });
-
-
 
 //Junta imagenes en una desde una lista de cartas y la manda
 function mergeImagesAndSend(chatId, cardList)
