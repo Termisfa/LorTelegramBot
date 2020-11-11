@@ -3,6 +3,7 @@
 const CardInfo = require('./CardInfo')
 
 const allCardsInfo = require('./allSets-es_es.json')
+const allCardsInfoEng = require('./allSets-en_us.json')
 
 
 
@@ -14,11 +15,24 @@ class Database
         let infoCardsProv = []
         cardName = cardName.toLowerCase()
         cardName = removeAccents(cardName)
+        //Busca las cartas en español
         allCardsInfo.forEach(card => {
             if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
                 infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
-            //infoCardsProv.push([element.name, element.assets[0].gameAbsolutePath])    
-          });
+        });
+        //Busca las cartas en inglés, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
+        allCardsInfoEng.forEach(card => {
+            if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
+            {
+                let bool = false
+                infoCardsProv.forEach(element => {
+                    if(card.cardCode == element.cardCode)
+                        bool = true
+                });
+                if(!bool)
+                    infoCardsProv.push(this.searchCardById(card.cardCode))
+            }   
+        });
         return infoCardsProv
     }
     //Devuelve la carta que coincida con un ID

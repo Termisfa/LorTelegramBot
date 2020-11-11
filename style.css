@@ -1,7 +1,7 @@
 
 
 .imgBackg { 
-  background: url('https://i.imgur.com/Frftr28.jpeg') no-repeat center center fixed;
+  background: url('https://sm.ign.com/ign_es/screenshot/default/maxresdefault_ee6u.jpg') no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -26,15 +26,38 @@ body {
     text-align: center;
   }
   
-  /* Clear floats after the columns */
-  .content:after {
-    content: '';
-    display: table;
-    clear: both;
+  .title {
+    display: flex;
+    -webkit-box-align: center;
+    align-items: center;
+    height: 20px;
+    margin-bottom: 16px;
+    margin-top: 12px;
+    
   }
 
-  img {
-    border-radius: 6px;
+  .titleLineLeft{
+    height: 1px;
+    width: 100%;
+    background-color: black;
+    flex: 1 1 auto;
+    margin-right: 16px;
+  }
+
+  .titleText{
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 20px;
+    text-align: center;
+    white-space: nowrap;    
+  }
+
+  .titleLineRight{
+    height: 1px;
+    width: 100%;
+    background-color: black;
+    flex: 1 1 auto;
+    margin-left: 16px;
   }
 
 
@@ -42,6 +65,9 @@ body {
     width: 300px; 
     position: relative;
     margin: 3px auto;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 6px;
 }
 
   .image {    
@@ -50,7 +76,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    border-radius: 6px;
+    border-radius: 5px;
     color: rgb(255, 255, 255);    
 }
 

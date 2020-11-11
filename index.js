@@ -13,8 +13,8 @@ const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
 const nodeHtmlToImage = require('node-html-to-image')
 
 // replace the value below with the Telegram token you receive from @BotFather
-//const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
-const token = process.env.BotToken
+const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
+//const token = process.env.BotToken
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
@@ -39,8 +39,16 @@ bot.onText(/^\/t (.+)/, (msg, match) => {
 });
 */
 
+//Comando para cafe
+bot.onText(/^\/cafe/, (msg) => {  
+  const chatId = msg.chat.id;
+  var aux = "Te gusta este bot? Me puedes ayudar donando una pequeña cantidad de dinero por Paypal, "
+  aux += "o simplemente compartirlo en otros grupos y redes sociales. Muchas gracias!! paypal.me/Termisfa"
+  bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
+});
+
 //Comando para info
-bot.onText(/^\/info$/, (msg) => {  
+bot.onText(/^\/info/, (msg) => {  
   const chatId = msg.chat.id;
   var aux = "*Listado de comandos:* \n"
   aux += "`!Deck code`: Muestra imagen de un deck \n"
@@ -134,12 +142,12 @@ function searchCardCommand(msg, match)
 
 
 //Actualizar comandos
-bot.onText(/^\!updateCommands/, (msg) => {  
+bot.onText(/^\/updateCommands$/, (msg) => {  
   const chatId = msg.chat.id;
   const opts = [
-    {command: 'info', description: 'Info sobre comandos'}
+    {command: 'info', description: 'Info sobre comandos'},
+    {command: 'cafe', description: 'Cómprame un café'}
    ];
-   console.log(opts)
    
    bot.setMyCommands(opts).then( () => {
        bot.sendMessage(chatId, "Comandos actualizados")
