@@ -8,10 +8,10 @@ Habla en privado a @LorTermisBot, o añádelo al grupo que quieras.
 
 ## Comandos
 
-/info: Información sobre los comandos. (space, space)
-/cafe: Cómprame un café. (space)
-!Deck code: Muestra imagen de un deck. También funcionan: !deck !d !D. (space)
-!Carta nombre: Muestra carta buscada. Si encuentra una sola, también muestra sus cartas relacionadas. También funcionan !carta !C !c. (space)
+/info: Información sobre los comandos.  
+/cafe: Cómprame un café.  
+!Deck code: Muestra imagen de un deck. También funcionan: !deck !d !D.  
+!Carta nombre: Muestra carta buscada. Si encuentra una sola, también muestra sus cartas relacionadas. También funcionan !carta !C !c.  
 
 ## Bugs, problemas y sugerencias
 
