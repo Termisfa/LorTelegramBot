@@ -1,12 +1,20 @@
 const TelegramBot = require('node-telegram-bot-api');
 var Database = require('./Database')
-var CardInfo = require('./CardInfo')
+var DeckImage = require('./DeckImage')
+
+//Para juntar imágenes
 const mergeImg = require('merge-img')
 var Jimp = require('jimp');
 
+//Para que funcione el DeckDecoder
+const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
+
+//Para convertir html a imagen
+const nodeHtmlToImage = require('node-html-to-image')
 
 // replace the value below with the Telegram token you receive from @BotFather
 const token = '1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs';
+//const token = process.env.BotToken
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
@@ -14,15 +22,105 @@ const bot = new TelegramBot(token, {polling: true});
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", console.log);
 
-// Matches "/echo [whatever]"
-bot.onText(/\/carta (.+)/, (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  // 'match' is the result of executing the regexp above on the text content
-  // of the message
+/*
+//Para hacer tests
+bot.onText(/^\/t (.+)/, (msg, match) => {
+  const chatId = msg.chat.id;
+  const opts = [
+    {command: 'eat', description: 'Command for eat'},
+    {command: 'run', description: 'Command for run'},
+    {command: 'run', description: 'Command for run'}
+   ];
+   
+   bot.setMyCommands(opts).then(function (info) {
+       console.log(info)
+     });;
+  //console.log(bot.getMyCommands())
+});
+*/
+
+//Comando para cafe
+bot.onText(/^\/cafe/, (msg) => {  
+  const chatId = msg.chat.id;
+  var aux = "Te gusta este bot? Me puedes ayudar donando una pequeña cantidad de dinero por Paypal, "
+  aux += "o simplemente compartirlo en otros grupos y redes sociales. Muchas gracias!! paypal.me/Termisfa"
+  bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
+});
+
+//Comando para info
+bot.onText(/^\/info/, (msg) => {  
+  const chatId = msg.chat.id;
+  var aux = "*Listado de comandos:* \n"
+  aux += "`!Deck code`: Muestra imagen de un deck \n"
+  aux += "`!Carta nombre`: Muestra carta buscada \n"
+  bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
+});
 
 
+//Comandos para buscar decks
+bot.onText(/^\!Deck (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+bot.onText(/^\!deck (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+bot.onText(/^\!D (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+bot.onText(/^\!d (.+)/, (msg, match) => {
+  searchDeckCommand(msg, match)
+});
+
+//Para buscar decks
+function searchDeckCommand(msg, match)
+{
+  const chatId = msg.chat.id;
+
+  var deck = DeckEncoder.decode(match[1])
+  if(deck == "InvalidDeck" || !deck)
+    bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+  else
+  {
+    try
+    {
+      deck = Database.sortDeckByElixir(deck)   
+
+      const promise = nodeHtmlToImage({
+        html: DeckImage.createDeckImage(deck),
+        puppeteerArgs: { args: ['--no-sandbox'] } 
+      });
+      promise.then((img) => {
+        //console.log(img)
+        bot.sendPhoto(chatId, img)
+      })
+    }
+    catch(error)
+    {
+      bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+    }
+    
+  }
+
+}
 
 
+//Comandos para buscar cartas
+bot.onText(/^\!Carta (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+bot.onText(/^\!carta (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+bot.onText(/^\!C (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+bot.onText(/^\!c (.+)/, (msg, match) => {
+  searchCardCommand(msg, match)
+});
+
+// Para buscar cartas
+function searchCardCommand(msg, match)
+{
   let infoCardsProv = Database.searchCardByName(match[1])  
 
   const chatId = msg.chat.id;
@@ -31,7 +129,7 @@ bot.onText(/\/carta (.+)/, (msg, match) => {
     //Si solo hay una coincidencia
     if(infoCardsProv.length == 1)
     {
-      infoCardsProv = getListByCardId(infoCardsProv[0])
+      infoCardsProv = Database.getListByCardId(infoCardsProv[0])
       mergeImagesAndSend(chatId, infoCardsProv)
     }      
     //Si hay varias
@@ -40,19 +138,22 @@ bot.onText(/\/carta (.+)/, (msg, match) => {
       mergeImagesAndSend(chatId, infoCardsProv)
     }   
   }
-});
-
-//Busca cartas relacionadas con una y devuelve la lista
-function getListByCardId(card)
-{
-  let cardListImages = [] 
-  cardListImages.push(card)
-  //console.log(card.associatedCardRefs)
-  card.relatedCards.forEach(element => {
-    cardListImages.push(Database.searchCardById(element))
-  });   
-  return cardListImages
 }
+
+
+//Actualizar comandos
+bot.onText(/^\/updateCommands$/, (msg) => {  
+  const chatId = msg.chat.id;
+  const opts = [
+    {command: 'info', description: 'Info sobre comandos'},
+    {command: 'cafe', description: 'Cómprame un café'}
+   ];
+   
+   bot.setMyCommands(opts).then( () => {
+       bot.sendMessage(chatId, "Comandos actualizados")
+     });
+  //console.log(bot.getMyCommands())
+});
 
 //Junta imagenes en una desde una lista de cartas y la manda
 function mergeImagesAndSend(chatId, cardList)
@@ -106,286 +207,3 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
   }
   return false
 }
-
-function quitarAcentos(cadena){
-	const acentos = {'á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
-	return cadena.split('').map( letra => acentos[letra] || letra).join('').toString();	
-}
-
-
-/*
-// Listen for any kind of message. There are different kinds of
-// messages.
-bot.on('message', (msg) => {
-  const chatId = msg.chat.id;
-  console.log("echo en recibir mensaje")
-  // send a message to the chat acknowledging receipt of their message
-  bot.sendMessage(chatId, 'Received your message');
-});
-*/
-
-//BOT ANTIGUO
-/*
-var express = require('express')
-var app = express()
-var bodyParser = require('body-parser')
-const axios = require('axios')
-var Database = require('./Database')
-var CardInfo = require('./CardInfo')
-const mergeImg = require('merge-img')
-var Jimp = require('jimp');
-const FormData = require('form-data');
-
-
-'use strict'
-
-
-//Esta parte es necesaria para que el bot funcione
-app.use(bodyParser.json()) // for parsing application/json
-app.use(
-bodyParser.urlencoded({
-    extended: true
-})
-) // for parsing application/x-www-form-urlencoded
-
-
-//Código necesario para descargar
-const fs = require('fs')
-const request = require('request')
-
-const download = (url, path) => {
-  return new Promise( function(resolve, reject)  { request.head(url, (err, res, body) => {
-    request(url)
-      .pipe(fs.createWriteStream(path))
-      .on('close', () => resolve(console.log(path + " creada")))
-  }) })
-}
-
-
-//This is the route the API will call
-app.post('/', function(req, res) {
-  try {     
-    const { message } = req.body
-
-    //Each message contains "text" and a "chat" object, which has an "id" which is the chat id
-
-    //Para test, borrar al final
-    
-    if(message.text == 1)
-    {
-      test(message, res)
-      return
-    }
-    
-
-
-
-    var botActivator = 'bot '
-    
-    if(!message)
-    {
-      console.log('llega hasta !message')
-      return res.end()
-    }
-
-    if(message.text.length <= botActivator.length)
-    {
-      console.log('llega hasta mensaje es demasiado corto')
-      return res.end()
-    }
-
-    
-
-    if (message.text.toLowerCase().substring(0, botActivator.length) !== botActivator) {
-      return res.end()
-    }
-    else
-    {
-      var msgReceived = message.text.substring(botActivator.length) 
-
-      var relatedActivator = "rel"
-      //Si lleva la palabra rel, para cartas relacionadas
-      if(msgReceived.substring(0, relatedActivator.length) === relatedActivator)
-      {
-        msgReceived = msgReceived.substring(relatedActivator.length)
-
-        let infoCardsProv = Database.searchCardByName(msgReceived)
-
-
-      } 
-
-      else
-      {      
-        let infoCardsProv = Database.searchCardByName(msgReceived)
-        
-
-        if(checkCorrectName(infoCardsProv, msgReceived, res, message))
-        {
-          infoCardsProv.forEach(element => {
-            sendPhoto(message, element.imageUrl, res)
-          });        
-        }
-      }
-    }
-  } catch (error) {
-    console.log("Error en app.post")
-    console.log(error)
-    res.end()
-  }  
-})
-
-//Mensajes a enviar cuando no encuentra carta o encuentra demasiadas. Devuelve true si es correcto
-function checkCorrectName(infoCardsProv, msgReceived, res, message)
-{
-  try { 
-    //Si no ha encontrado ninguna carta
-    if(infoCardsProv.length == 0)
-    {
-      postMessage(message, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'", res)      
-      return false
-    }
-    //Si ha encontrado más de 5 cartas que contenga ese nombre
-    else if(infoCardsProv.length > 5)
-    {
-      let aux = "Se han encontrado " + infoCardsProv.length + " cartas que incluyen en el nombre '" + msgReceived + "'. "
-      if(infoCardsProv.length > 15)
-        aux += "Especifica más por favor."
-      else
-      {
-        aux += "Listado de cartas encontradas: "
-        infoCardsProv.forEach(element => {
-          aux += "'" + element.name + "', "      
-        });
-        //Quitamos la coma y el espacio final
-        aux.substring(0, aux.length - 2)
-      }
-      postMessage(message, aux, res)
-      return false
-    }
-    //Si todo es correcto
-    return true
-  } catch (error) {
-    console.log("Error en checkCorrectName")
-    console.log(error)
-  }
-  return false
-}
-
-
-//Función para hacer tests, borrar cuando esté terminado
-function test(message, res)
-{
-  try {   
-    mergeImg(['https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT041.png', 'https://dd.b.pvp.net/1_12_0/set3/es_es/img/cards/03MT005.png'])
-            .then((img) => { 
-              console.log("Imagen guardada")
-              img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-                //res.writeHead(200, { 'content-type': 'multipart/form-data' });
-                const formData = new FormData();
-                formData.append('imagen', buffer);
-                
-                sendPhotoTest(message, formData, res)
-              });  
-                  
-    
-  })
-} 
-  catch (error) {
-    console.log("Error en test")
-    //console.log(error)
-    res.end()
-  }
-}
-//Para mandar foto. Result puede ser una url o la ruta a la imagen
-function sendPhotoTest(message, result, res)
-{ 
-    console.log("Entra a send photo test")
-    console.log(result.getHeaders())
-    axios
-    .post(
-      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
-      {
-        chat_id: message.chat.id,
-        photo: result,       
-        headers: result.getHeaders()
-      }      
-    )
-    .then(response => {
-      // We get here if the message was successfully posted
-      console.log('Entra en respuesta foto test OK')
-      res.end('ok')
-    })
-    .catch(err => {
-      // ...and here if it was not
-      //console.log('Error :', err)
-      postMessage(message, JSON.stringify(err), res)
-      console.log("Error en sendPhotoTest: " + JSON.stringify(err))
-      //res.end('Error :' + err)
-    }) 
-}
-
-//Si entra en demasiados res.end(), hace que vayan las respuestas con delay
-//Para mandar un mensaje
-function postMessage(message, result, res)
-{
-  try {   
-    axios
-    .post(
-      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendMessage',
-      {
-        chat_id: message.chat.id,
-        text: result
-      }
-    )
-    .then(response => {
-      // We get here if the message was successfully posted
-      console.log('Entra en respuesta texto OK')
-      console.log('Respuesta de telegram: ' + response.ok)
-      res.end('ok')
-    })
-    .catch(err => {
-      // ...and here if it was not
-      console.log('Error :', err)
-      res.end('Error :' + err)
-    })
-  } catch (error) {
-    console.log("Error en postMessage")
-    console.log(error)
-    res.end()
-  }
-}
-
-//Para mandar foto. Result puede ser una url o la ruta a la imagen
-function sendPhoto(message, result, res)
-{
-  try {   
-    axios
-    .post(
-      'https://api.telegram.org/bot1336055457:AAHWh5XS1CkeaObc-JKA6yY2TX9pKHxOj-s/sendPhoto',
-      {
-        chat_id: message.chat.id,
-        photo: result
-      }      
-    )
-    .then(response => {
-      // We get here if the message was successfully posted
-      console.log('Entra en respuesta foto OK')
-      res.end('ok')
-    })
-    .catch(err => {
-      // ...and here if it was not
-      console.log('Error :', err)
-      res.end('Error :' + err)
-    })
-  } catch (error) {
-    console.log("Error en sendPhoto")
-    //console.log(error)
-    res.end()
-  }
-}
-
-// Finally, start our server
-app.listen(3000, function() {
-  console.log('Telegram app listening on port 3000!')
-})
-*/
