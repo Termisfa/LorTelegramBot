@@ -11,7 +11,7 @@ Habla en privado a @LorTermisBot, o añádelo al grupo que quieras.
 /info: Información sobre los comandos.  
 /cafe: Cómprame un café.  
 !Deck code: Muestra imagen de un deck. También funcionan: !deck !d !D.  
-!Carta nombre: Muestra carta buscada. Si encuentra una sola, también muestra sus cartas relacionadas. También funcionan !carta !C !c.  
+!Carta nombre: Muestra carta buscada. Si encuentra una sola, también muestra sus cartas relacionadas. La busca en español e inglés. También funcionan !carta !C !c.  
 
 ## Bugs, problemas y sugerencias
 
