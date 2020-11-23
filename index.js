@@ -13,13 +13,15 @@ const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
 const nodeHtmlToImage = require('node-html-to-image')
 
 // replace the value below with the Telegram token you receive from @BotFather
-const token = process.env.BotToken
+const token = "1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs"
+//const token = process.env.BotToken
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", console.log);
+bot.ed
 
 /*
 //Para hacer tests
@@ -38,6 +40,8 @@ bot.onText(/^\/t (.+)/, (msg, match) => {
 });
 */
 
+
+
 //Comando para cafe
 bot.onText(/^\/cafe/, (msg) => {  
   const chatId = msg.chat.id;
@@ -54,6 +58,75 @@ bot.onText(/^\/info/, (msg) => {
   aux += "`!Carta nombre`: Muestra carta buscada \n"
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
 });
+
+//Modo inline
+bot.on('inline_query', msg => {
+  let infoCardsProv = Database.searchCardByName(msg.query) 
+
+  if(infoCardsProv.length == 0)
+  {
+    let listInlineQueryToSend = []
+    for(var i = 0; i < infoCardsProv.length; i++) {
+      var inlineQueryResultPhoto = {
+        id: infoCardsProv[i].cardCode,
+        type: "photo",
+        photo_url: infoCardsProv[i].imageUrl,
+        thumb_url: infoCardsProv[i].imageUrl,
+        title: infoCardsProv[i].name,
+        photo_height: 70,
+        photo_width: 48
+        
+      }
+      listInlineQueryToSend.push(inlineQueryResultPhoto)
+      if(i == 49)
+        break;
+    };
+    bot.answerInlineQuery(msg.id, listInlineQueryToSend)
+  }
+  else
+  {           
+    bot.answerInlineQuery(msg.id, [
+      {
+        id: '0',
+        type: "article",
+        title: "Error",
+        description: "No se ha encontrado ninguna carta",
+        message_text: "No se ha encontrado ninguna carta"
+      }
+    ]);
+/*
+    let cardListImages = [] 
+
+    infoCardsProv.forEach(element => {
+      cardListImages.push(element.imageUrl)
+    });   
+  
+    mergeImg(cardListImages)
+    .then((img) => { 
+      img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+        bot.answerInlineQuery(msg.id, [
+          {
+            id: '0',
+            type: "photo",
+            title: "Error",
+            description: "No se ha encontrado ninguna carta",
+            photo_url: buffer,
+            thumb_url: buffer
+          }
+        ])
+      });
+    })
+*/
+  }
+  
+
+})
+/*
+bot.on("chosen_inline_result", msg =>
+{
+  console.log(msg);
+});*/
+
 
 
 //Comandos para buscar decks
