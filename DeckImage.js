@@ -58,21 +58,17 @@ function cssMalHecho()
 
 
 //Lee el css y lo devuelve como string
-async function readFileCSS()
+function readFileCSS()
 {    
-    var aux = "No ha funcionado"
-    try {
-        await fs.readFile('./style.css', 'utf8', function (err,data) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log(data)
+    try 
+    {
+        fs.readFile('./style.css', 'utf8', function (err,data) {
             aux = data
             });
-    } catch (error) {
+    } 
+    catch (error) {
         console.log("Error :" + error)
     }
-    return await  aux
     
 }
 

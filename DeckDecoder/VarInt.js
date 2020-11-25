@@ -18,7 +18,7 @@ class VarInt {
       currentShift += 7
     }
 
-    console.log('Byte array did not contain valid varints.')
+    //console.log('Byte array did not contain valid varints.')
     return msgError
   }
 

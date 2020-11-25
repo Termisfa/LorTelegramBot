@@ -6,7 +6,7 @@
   -moz-background-size: cover;
   -o-background-size: cover;
   background-size: cover;
-  opacity: 0.5;
+  opacity: 0.2;
   top: 0;
   left: 0;
   bottom: 0;
@@ -16,7 +16,7 @@
 }
 
 body {
-  width: 950px; 
+  width: 1000px; 
   font-family: Arial, Helvetica, sans-serif;
 }
 

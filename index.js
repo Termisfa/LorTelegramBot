@@ -25,25 +25,11 @@ bot.ed
 
 
 //Para hacer tests
-const https = require('https')
 bot.onText(/^\!t (.+)/, (msg, match) => {
-  let infoCardsProv = Database.searchCardByName(match[1]) 
-  let cardListImages = [] 
-
-  infoCardsProv.forEach(element => {
-    cardListImages.push(element.imageUrl)
-  });   
-
-  mergeImg(cardListImages)
-  .then((img) => { 
-    img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-
-      
-
-
-    });
-  })
+    
 });
+
+
 
 
 
@@ -65,73 +51,91 @@ bot.onText(/^\/info/, (msg) => {
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
 });
 
+/*
+bot.on("message", (msg) => {  
+  console.log(msg)
+});
+*/
+
 //Modo inline
 bot.on('inline_query', msg => {
-  let infoCardsProv = Database.searchCardByNameAll(msg.query) 
-
-  if(infoCardsProv.length > 0)
+  
+  if(!isDeckInline(msg))
   {
-    let listInlineQueryToSend = []
-    for(var i = 0; i < infoCardsProv.length; i++) {
-      var inlineQueryResultPhoto = {
-        id: infoCardsProv[i].cardCode,
-        type: "photo",
-        photo_url: infoCardsProv[i].imageUrl,
-        thumb_url: infoCardsProv[i].imageUrl,
-        title: infoCardsProv[i].name,
-        photo_height: 70,
-        photo_width: 48
-        
-      }
-      listInlineQueryToSend.push(inlineQueryResultPhoto)
-      if(i == 49)
-        break;
-    };
-    bot.answerInlineQuery(msg.id, listInlineQueryToSend)
-  }
-  else
-  {           
-    bot.answerInlineQuery(msg.id, [
-      {
-        id: '0',
-        type: "article",
-        title: "Error",
-        description: "No se ha encontrado ninguna carta",
-        message_text: "No se ha encontrado ninguna carta"
-      }
-    ]);
-/*
-    let cardListImages = [] 
+    let infoCardsProv = Database.searchCardByNameAll(msg.query) 
 
-    infoCardsProv.forEach(element => {
-      cardListImages.push(element.imageUrl)
-    });   
-  
-    mergeImg(cardListImages)
-    .then((img) => { 
-      img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-        bot.answerInlineQuery(msg.id, [
-          {
-            id: '0',
-            type: "photo",
-            title: "Error",
-            description: "No se ha encontrado ninguna carta",
-            photo_url: buffer,
-            thumb_url: buffer
-          }
-        ])
-      });
-    })
-*/
+    if(infoCardsProv.length > 0)
+    {
+      let listInlineQueryToSend = []
+      for(var i = 0; i < infoCardsProv.length; i++) {
+        var inlineQueryResultPhoto = {
+          id: infoCardsProv[i].cardCode,
+          type: "photo",
+          photo_url: infoCardsProv[i].imageUrl,
+          thumb_url: infoCardsProv[i].imageUrl,
+          title: infoCardsProv[i].name,
+          photo_height: 70,
+          photo_width: 48
+          
+        }
+        listInlineQueryToSend.push(inlineQueryResultPhoto)
+        if(i == 49)
+          break;
+      };
+      bot.answerInlineQuery(msg.id, listInlineQueryToSend)
+    }
+    else
+    {           
+      bot.answerInlineQuery(msg.id, [
+        {
+          id: '0',
+          type: "article",
+          title: "Error",
+          description: "No se ha encontrado ninguna carta ni deck",
+          message_text: "No se ha encontrado ninguna carta ni deck"
+        }
+      ]);
+    }
   }
-  
 
 })
-/*
-bot.on("chosen_inline_result", msg =>
+
+function isDeckInline(msg)
 {
-  console.log(msg);
-});*/
+  var deck = DeckEncoder.decode(msg.query)
+  if(deck == "InvalidDeck" || !deck)
+    return false
+  else
+  {
+    try
+    {
+      deck = Database.sortDeckByElixir(deck)   
+
+      const promise = nodeHtmlToImage({
+        html: DeckImage.createDeckImage(deck),
+        puppeteerArgs: { args: ['--no-sandbox'] } 
+      });
+      promise.then((img) => {
+        //-437983251 es el ID del grupo donde escupe los resultados
+        var promise2 = bot.sendPhoto(-437983251, img)
+        promise2.then((result) => {
+          bot.answerInlineQuery(msg.id, [
+            {
+              id: '0',
+              type: "photo",
+              photo_file_id: result.photo[1].file_id
+            }
+          ]);
+        })
+      })
+    }
+    catch(error)
+    {
+      return false
+    }    
+  }
+  return true
+}
 
 
 
@@ -175,10 +179,8 @@ function searchDeckCommand(msg, match)
     catch(error)
     {
       bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
-    }
-    
+    } 
   }
-
 }
 
 
