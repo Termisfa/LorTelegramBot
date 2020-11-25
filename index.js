@@ -23,22 +23,28 @@ const bot = new TelegramBot(token, {polling: true});
 bot.on("polling_error", console.log);
 bot.ed
 
-/*
+
 //Para hacer tests
-bot.onText(/^\/t (.+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const opts = [
-    {command: 'eat', description: 'Command for eat'},
-    {command: 'run', description: 'Command for run'},
-    {command: 'run', description: 'Command for run'}
-   ];
-   
-   bot.setMyCommands(opts).then(function (info) {
-       console.log(info)
-     });;
-  //console.log(bot.getMyCommands())
+const https = require('https')
+bot.onText(/^\!t (.+)/, (msg, match) => {
+  let infoCardsProv = Database.searchCardByName(match[1]) 
+  let cardListImages = [] 
+
+  infoCardsProv.forEach(element => {
+    cardListImages.push(element.imageUrl)
+  });   
+
+  mergeImg(cardListImages)
+  .then((img) => { 
+    img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+
+      
+
+
+    });
+  })
 });
-*/
+
 
 
 
@@ -61,9 +67,9 @@ bot.onText(/^\/info/, (msg) => {
 
 //Modo inline
 bot.on('inline_query', msg => {
-  let infoCardsProv = Database.searchCardByName(msg.query) 
+  let infoCardsProv = Database.searchCardByNameAll(msg.query) 
 
-  if(infoCardsProv.length == 0)
+  if(infoCardsProv.length > 0)
   {
     let listInlineQueryToSend = []
     for(var i = 0; i < infoCardsProv.length; i++) {
