@@ -111,23 +111,25 @@ function isDeckInline(msg)
     {
       deck = Database.sortDeckByElixir(deck)   
 
-      const promise = nodeHtmlToImage({
-        html: DeckImage.createDeckImage(deck),
-        puppeteerArgs: { args: ['--no-sandbox'] } 
-      });
-      promise.then((img) => {
-        //-437983251 es el ID del grupo donde escupe los resultados
-        var promise2 = bot.sendPhoto(-437983251, img)
-        promise2.then((result) => {
-          bot.answerInlineQuery(msg.id, [
-            {
-              id: '0',
-              type: "photo",
-              photo_file_id: result.photo[1].file_id
-            }
-          ]);
+      DeckImage.createDeckImage(deck).then((htmlCode) => {
+        const promise = nodeHtmlToImage({
+          html: htmlCode,
+          puppeteerArgs: { args: ['--no-sandbox'] } 
+        });
+        promise.then((img) => {
+          //-437983251 es el ID del grupo donde escupe los resultados
+          var promise2 = bot.sendPhoto(-437983251, img)
+          promise2.then((result) => {
+            bot.answerInlineQuery(msg.id, [
+              {
+                id: '0',
+                type: "photo",
+                photo_file_id: result.photo[1].file_id
+              }
+            ]);
+          })
         })
-      })
+      })      
     }
     catch(error)
     {
@@ -167,14 +169,17 @@ function searchDeckCommand(msg, match)
     {
       deck = Database.sortDeckByElixir(deck)   
 
-      const promise = nodeHtmlToImage({
-        html: DeckImage.createDeckImage(deck),
-        puppeteerArgs: { args: ['--no-sandbox'] } 
-      });
-      promise.then((img) => {
-        //console.log(img)
-        bot.sendPhoto(chatId, img)
-      })
+      DeckImage.createDeckImage(deck).then((htmlCode) => {
+        //console.log(htmlCode)
+        const promise =  nodeHtmlToImage({
+          html: htmlCode,
+          puppeteerArgs: { args: ['--no-sandbox'] } 
+        });
+        promise.then((img) => {
+          //console.log(img)
+          bot.sendPhoto(chatId, img)
+        })
+      }) 
     }
     catch(error)
     {
