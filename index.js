@@ -169,6 +169,7 @@ function searchDeckCommand(msg, match)
     {
       deck = Database.sortDeckByElixir(deck)   
 
+      
       DeckImage.createDeckImage(deck).then((htmlCode) => {
         //console.log(htmlCode)
         const promise =  nodeHtmlToImage({

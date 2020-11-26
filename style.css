@@ -17,7 +17,7 @@ body {width: 1000px;height: 550px;
 .column {
     float: left;
     width: 33.33%;
-     text-align: center;
+    text-align: center;
 }
 .title {
     display: flex;
@@ -134,4 +134,46 @@ body {width: 1000px;height: 550px;
     line-height: 1px;
     vertical-align: middle;
     margin-left: -3px;
+}
+.regions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(min-content, 25%));
+}
+.regionCentered {
+    text-align: center;
+    
+}
+.region {
+    display: inline-block;
+    position: relative;
+    margin-right: 4px;
+    background-color: rgb(51, 38, 33);
+    border-radius: 15px;
+}
+.imgRegion {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+}
+.regionQty {
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    background-color: rgb(51, 38, 33);
+    box-shadow: rgba(20, 11, 36, 0.5) 0px 2px 4px 0px;
+    border: 1px solid rgb(189, 158, 89);
+    border-radius: 100%;
+    font-weight: 700;
+    text-align: center;
+    line-height: 15px;
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    position: absolute;
+    right: -4px;
+    bottom: -10px;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
 }

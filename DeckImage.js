@@ -3,8 +3,11 @@ var fs = require('fs').promises;
 const { resolve } = require('path');
 var ColorRegion = require('./ColorRegion')
 var colorRegion = ColorRegion.from()
-
+var CardsRegion = require('./CardsRegion')
+var cardsRegion
 var cardMostUsed
+var htmlString
+
 
 class DeckImage
 {
@@ -12,8 +15,10 @@ class DeckImage
     static createDeckImage(deckList)
     {
         cardMostUsed = 0
+        cardsRegion = CardsRegion.from()
+        
         return (async() =>  {
-            var htmlString = ""
+            htmlString = ""
             htmlString += "<html>"
             htmlString += "<head><style>"
             await readFileCSS().then((data) => htmlString += data)
@@ -21,13 +26,18 @@ class DeckImage
             htmlString += "<body><div class='imgBackg'></div><div class='content'>"
             htmlString += "<div class='column' id='column1'>"
             htmlString += createDiv(deckList, "Campeón")
-            htmlString += createDiv(deckList, "Hito")
+            htmlString += createDiv(deckList, "Hito")   
+            //Uso placeholderRegions para sustituirlo luego por las regiones 
+            htmlString += "placeholderRegions"                    
             htmlString += "</div><div class='column' id='column2'>"
             htmlString += createDiv(deckList, "Unidad")
             htmlString += "</div><div class='column' id='column3'>"
             htmlString += createDiv(deckList, "Hechizo")
             htmlString += "</div></div></body></html>"
-            
+
+            //Sustituimos el placeholder de regiones
+            htmlString = htmlString.replace("placeholderRegions", createDivRegions())
+
             //Reemplazamos el height del body según el tipo de carta más usada
             cardMostUsed = cardMostUsed * 45 + 50
             if(cardMostUsed > 550)
@@ -63,6 +73,8 @@ function createDiv(deckList, typeOfCard)
             divString += createDivCard(cardInDeck)
             countAll += cardInDeck.count
             countDifferent ++
+            cardsRegion.pushCard(cardInDeck.card.faction, cardInDeck.count)
+           
         }
     });
     divString += "</div>"
@@ -72,6 +84,9 @@ function createDiv(deckList, typeOfCard)
 
     //Agregamos al inicio de la cadena
     divString = divString.replace(/^/, "<div><div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>" + selectNameForTitle(typeOfCard) + " " + countAll + "</div><div class = 'titleLineRight'></div></div>")
+    
+    if(countAll == 0)
+        return ""
 
     return divString
 }
@@ -99,6 +114,36 @@ function selectNameForTitle(typeOfCard)
         case "Unidad": return "Adeptos"
         case "Hechizo": return "Hechizos"
     }
+}
+
+//Devuelve el div completo con las regiones
+function createDivRegions()
+{
+    var regionsUsed = cardsRegion.regionsUsed.length   
+    var divString = ""
+    divString = "<div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>Regiones</div><div class = 'titleLineRight'></div></div>"
+    divString += "<div class='regions'>"
+    if(regionsUsed == 2)//Si hay 2 regiones, añadimos una vacía por estética
+        divString += "<div class='regionCentered'></div>"
+    else
+        htmlString = htmlString.replace("4, minmax(min-content, 25%)", regionsUsed + ", minmax(min-content, " + 100/regionsUsed + "%)")
+    
+    for(var i = 0; i < regionsUsed; i++)
+    {
+        divString += createDivOneRegion(cardsRegion.regionsUsed[i])        
+    }
+    divString += "</div>"
+    return divString
+}
+//Devuelve el div de una región
+function createDivOneRegion(region)
+{
+    divString = "<div class='regionCentered'><div class='region'>"
+    divString += "<img src='https://cdn-lor.mobalytics.gg/production/images/svg/region/" + region + ".svg' class='imgRegion'>"
+    divString += "<div class='regionQty'>" + cardsRegion.getQtyRegion(region) + "</div>"
+    divString += "</div></div>"
+    
+    return divString
 }
 
 
