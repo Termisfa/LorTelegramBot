@@ -14,7 +14,7 @@ Ahora también funciona de manera Inline en cualquier grupo o chat privado.
 !Deck code: Muestra imagen de un deck. También funcionan: !deck !d !D.  
 !Carta nombre: Muestra carta buscada. Si encuentra una sola, también muestra sus cartas relacionadas. La busca en español e inglés. También funcionan !carta !C !c. 
 
-# Modo inline
+## Modo inline
 
 En cualquier chat (sin necesidad de que el bot esté dentro) usa @LorTermisBot seguido del nombre de una carta, o de el código de un deck. Después de esperar 2 o 3 segundos como mucho, aparecerá la imagen o imágenes como resultados. Selecciona el deseado, y el bot responderá en ese chat con la imagen.
 
