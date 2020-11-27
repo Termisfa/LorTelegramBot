@@ -47,6 +47,8 @@ bot.onText(/^\/info/, (msg) => {
   var aux = "*Listado de comandos:* \n"
   aux += "`!Deck code`: Muestra imagen de un deck \n"
   aux += "`!Carta nombre`: Muestra carta buscada \n"
+  aux += "*Modo inline:* \n"
+  aux += "En cualquier chat (sin necesidad de que el bot esté dentro) usa @LorTermisBot seguido del nombre de una carta, o de el código de un deck. Después de esperar 2 o 3 segundos como mucho, aparecerá la imagen o imágenes como resultados. Selecciona el deseado, y el bot responderá en ese chat con la imagen."
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
 });
 
