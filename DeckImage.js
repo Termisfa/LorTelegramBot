@@ -1,8 +1,12 @@
 const { rejects } = require('assert');
-var fs = require('fs');
+var fs = require('fs').promises;
 const { resolve } = require('path');
 var ColorRegion = require('./ColorRegion')
 var colorRegion = ColorRegion.from()
+var CardsRegion = require('./CardsRegion')
+var cardsRegion
+var cardMostUsed
+var htmlString
 
 
 class DeckImage
@@ -10,90 +14,79 @@ class DeckImage
     //Devuelve el HTML completo en String
     static createDeckImage(deckList)
     {
-        //console.log(readFileCSS())
-        var htmlString = "<html>"
-        htmlString += "<head><style>"
-        htmlString += cssMalHecho()
-        htmlString += "</style></head>"
-        htmlString += "<body><div class='imgBackg'></div><div class='content'>"
-        htmlString += "<div class='column' id='column1'>"
-        htmlString += createDiv(deckList, "Campeón")
-        htmlString += createDiv(deckList, "Hito")
-        htmlString += "</div><div class='column' id='column2'>"
-        htmlString += createDiv(deckList, "Unidad")
-        htmlString += "</div><div class='column' id='column3'>"
-        htmlString += createDiv(deckList, "Hechizo")
+        cardMostUsed = 0
+        cardsRegion = CardsRegion.from()
+        
+        return (async() =>  {
+            htmlString = ""
+            htmlString += "<html>"
+            htmlString += "<head><style>"
+            await readFileCSS().then((data) => htmlString += data)
+            htmlString += "</style></head>"
+            htmlString += "<body><div class='imgBackg'></div><div class='content'>"
+            htmlString += "<div class='column' id='column1'>"
+            htmlString += createDiv(deckList, "Campeón")
+            htmlString += createDiv(deckList, "Hito")   
+            //Uso placeholderRegions para sustituirlo luego por las regiones 
+            htmlString += "placeholderRegions"                    
+            htmlString += "</div><div class='column' id='column2'>"
+            htmlString += createDiv(deckList, "Unidad")
+            htmlString += "</div><div class='column' id='column3'>"
+            htmlString += createDiv(deckList, "Hechizo")
+            htmlString += "</div></div></body></html>"
 
+            //Sustituimos el placeholder de regiones
+            htmlString = htmlString.replace("placeholderRegions", createDivRegions())
 
-        htmlString += "</div></div></body></html>"
-        //console.log(htmlString)
+            //Reemplazamos el height del body según el tipo de carta más usada
+            cardMostUsed = cardMostUsed * 45 + 50
+            if(cardMostUsed > 550)
+                htmlString = htmlString.replace("body {width: 1000px;height: 550px;", "body {width: 1000px;height: " + cardMostUsed + "px;")
 
-        return htmlString
+            return htmlString
+         })();
     } 
 }
 
-function cssMalHecho()
-{
-    var aux = ""
-    aux += ".imgBackg { background: url('https://sm.ign.com/ign_es/screenshot/default/maxresdefault_ee6u.jpg') no-repeat center center fixed;webkit-background-size: cover;-moz-background-size: cover;-o-background-size: cover;background-size: cover;opacity: 0.2;top: 0;left: 0;bottom: 0;right: 0;position: absolute;z-index: -1;  }"
-    aux += "body {width: 1000px; font-family: Arial, Helvetica, sans-serif;}"
-    aux += ".column {float: left;width: 33.33%; text-align: center; }"
-    aux += ".title {display: flex;-webkit-box-align: center;align-items: center;height: 20px;margin-bottom: 16px;margin-top: 12px; margin-left: 15px;margin-right: 15px;}"
-    aux += ".titleLineLeft{height: 1px;width: 100%;background-color: black;flex: 1 1 auto;margin-right: 16px;}"
-    aux += ".titleText{font-size: 15px;font-weight: 700;line-height: 20px;text-align: center;white-space: nowrap;}"
-    aux += ".titleLineRight{height: 1px;width: 100%;background-color: black;flex: 1 1 auto;margin-left: 16px;}"
-    aux += "  .boxImg {width: 300px; position: relative;margin: 3px auto;border-style: solid;border-width: 1px;border-radius: 6px;}"
-    aux += "  .image {height: 20px;display: flex;justify-content: space-between;align-items: center;padding: 10px;border-radius: 5px;color: rgb(255, 255, 255);    }"
-    aux += ".elixirCostBox {display: inline-grid;justify-content: center;align-items: center;border-radius: 100%;border: 1px solid rgb(189, 158, 89);box-shadow: rgba(20, 11, 36, 0.8) 0px 0px 6px 0px, black 0px 0px 0px 2px inset;background-image: linear-gradient(138deg, rgb(160, 223, 246) 18%, rgba(41, 150, 164, 0) 35%, rgba(41, 150, 164, 0) 67%, rgb(160, 223, 246) 82%), radial-gradient(circle at 50% 50%, rgb(47, 79, 143), rgb(41, 70, 129) 44%, rgb(9, 127, 149) 73%, rgb(45, 165, 183) 76%);width: 20px;height: 20px;flex: 0 0 auto;margin-right: 16px;}"
-    aux += ".elixirCost {font-size: 12px;line-height: 20px;font-weight: bold;text-align: center;color: rgb(255, 255, 255);}"
-    aux += ".cardName {text-align: left;font-size: 14px;line-height: 20px;font-weight: bold;text-overflow: ellipsis;overflow: hidden;white-space: nowrap;flex: 0 1 auto;padding-right: 4px;width: 100%;align-self: flex-start;text-shadow: rgb(0, 0, 0) 0px 1px 3px;letter-spacing: 0.25px;}"
-    aux += ".boxOutQty {border: 1px solid rgba(189, 158, 89, 0.6);background: linear-gradient(313.24deg, rgb(56, 43, 33) 0%, rgb(46, 33, 33) 100%);box-shadow: rgba(20, 11, 36, 0.6) 0px 0px 4px 0px;border-radius: 3px;overflow: hidden;flex: 0 0 auto;}"
-    aux += ".boxInQty {border: 1px solid rgb(189, 158, 89);background: linear-gradient(313.24deg, rgb(56, 43, 33) 0%, rgb(46, 33, 33) 100%);margin: 2px;padding: 0px 4px;border-radius: 3px;box-sizing: border-box;}"
-    aux += ".textQtyX {margin-top: 2px;margin-right: 5px;font-size: 8px;font-weight: 700;display: inline-block;line-height: 1px;vertical-align: middle;}"
-    aux += ".textQty {font-size: 12px;font-weight: 700;display: inline-block;line-height: 1px;vertical-align: middle;margin-left: -3px;}"
-
-    return aux
-}
-
-
-
-//Lee el css y lo devuelve como string
-async function readFileCSS()
+//Lee el css y devuelve una promesa, cuando se resuelva será el String del CSS
+function readFileCSS()
 {    
-    var aux = "No ha funcionado"
-    try {
-        await fs.readFile('./style.css', 'utf8', function (err,data) {
-            if (err) {
-                return console.log(err);
-            }
-            console.log(data)
-            aux = data
-            });
-    } catch (error) {
+    try 
+    {
+        return fs.readFile('./style.css', 'utf8', function (err,data) {});
+    } 
+    catch (error) {
         console.log("Error :" + error)
-    }
-    return await  aux
-    
+    }   
 }
-
-
 
 //Devuelve el div completo en String de las cartas
 function createDiv(deckList, typeOfCard)
 {
     var divString = ""
-    var count = 0
+    //countAll cuenta el total de cartas del mismo tipo. countDifferent cuenta cuantas cartas diferentes hay del mismo tipo
+    var countAll = 0
+    var countDifferent = 1
     deckList.forEach(cardInDeck => {
         if(cardInDeck.card.cardType == typeOfCard)
         {
             divString += createDivCard(cardInDeck)
-            count += cardInDeck.count
+            countAll += cardInDeck.count
+            countDifferent ++
+            cardsRegion.pushCard(cardInDeck.card.faction, cardInDeck.count)
+           
         }
     });
     divString += "</div>"
 
+    if(cardMostUsed < countDifferent)
+        cardMostUsed = countDifferent
+
     //Agregamos al inicio de la cadena
-    divString = divString.replace(/^/, "<div><div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>" + selectNameForTitle(typeOfCard) + " " + count + "</div><div class = 'titleLineRight'></div></div>")
+    divString = divString.replace(/^/, "<div><div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>" + selectNameForTitle(typeOfCard) + " " + countAll + "</div><div class = 'titleLineRight'></div></div>")
+    
+    if(countAll == 0)
+        return ""
 
     return divString
 }
@@ -121,6 +114,36 @@ function selectNameForTitle(typeOfCard)
         case "Unidad": return "Adeptos"
         case "Hechizo": return "Hechizos"
     }
+}
+
+//Devuelve el div completo con las regiones
+function createDivRegions()
+{
+    var regionsUsed = cardsRegion.regionsUsed.length   
+    var divString = ""
+    divString = "<div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>Regiones</div><div class = 'titleLineRight'></div></div>"
+    divString += "<div class='regions'>"
+    if(regionsUsed == 2)//Si hay 2 regiones, añadimos una vacía por estética
+        divString += "<div class='regionCentered'></div>"
+    else
+        htmlString = htmlString.replace("4, minmax(min-content, 25%)", regionsUsed + ", minmax(min-content, " + 100/regionsUsed + "%)")
+    
+    for(var i = 0; i < regionsUsed; i++)
+    {
+        divString += createDivOneRegion(cardsRegion.regionsUsed[i])        
+    }
+    divString += "</div>"
+    return divString
+}
+//Devuelve el div de una región
+function createDivOneRegion(region)
+{
+    divString = "<div class='regionCentered'><div class='region'>"
+    divString += "<img src='https://cdn-lor.mobalytics.gg/production/images/svg/region/" + region + ".svg' class='imgRegion'>"
+    divString += "<div class='regionQty'>" + cardsRegion.getQtyRegion(region) + "</div>"
+    divString += "</div></div>"
+    
+    return divString
 }
 
 

@@ -9,7 +9,7 @@ const allCardsInfoEng = require('./allSets-en_us.json')
 
 class Database
 {
-    //Devuelve una lista de cartas con todas las que contengan un string
+    //Devuelve una lista de cartas coleccionables con todas las que contengan un string
     static searchCardByName(cardName)
     {
         let infoCardsProv = []
@@ -35,6 +35,32 @@ class Database
         });
         return infoCardsProv
     }
+        //Devuelve una lista de cartas con todas las que contengan un string, incluídas las no coleccionables
+        static searchCardByNameAll(cardName)
+        {
+            let infoCardsProv = []
+            cardName = cardName.toLowerCase()
+            cardName = removeAccents(cardName)
+            //Busca las cartas en español
+            allCardsInfo.forEach(card => {
+                if(removeAccents(card.name.toLowerCase()).includes(cardName))
+                    infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
+            });
+            //Busca las cartas en inglés, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
+            allCardsInfoEng.forEach(card => {
+                if(removeAccents(card.name.toLowerCase()).includes(cardName))
+                {
+                    let bool = false
+                    infoCardsProv.forEach(element => {
+                        if(card.cardCode == element.cardCode)
+                            bool = true
+                    });
+                    if(!bool)
+                        infoCardsProv.push(this.searchCardById(card.cardCode))
+                }   
+            });
+            return infoCardsProv
+        }
     //Devuelve la carta que coincida con un ID
     static searchCardById(cardId)
     {

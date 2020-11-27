@@ -20,23 +20,18 @@ const bot = new TelegramBot(token, {polling: true});
 
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", console.log);
+bot.ed
 
-/*
+
 //Para hacer tests
-bot.onText(/^\/t (.+)/, (msg, match) => {
-  const chatId = msg.chat.id;
-  const opts = [
-    {command: 'eat', description: 'Command for eat'},
-    {command: 'run', description: 'Command for run'},
-    {command: 'run', description: 'Command for run'}
-   ];
-   
-   bot.setMyCommands(opts).then(function (info) {
-       console.log(info)
-     });;
-  //console.log(bot.getMyCommands())
+bot.onText(/^\!t (.+)/, (msg, match) => {
+    
 });
-*/
+
+
+
+
+
 
 //Comando para cafe
 bot.onText(/^\/cafe/, (msg) => {  
@@ -54,6 +49,95 @@ bot.onText(/^\/info/, (msg) => {
   aux += "`!Carta nombre`: Muestra carta buscada \n"
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
 });
+
+/*
+bot.on("message", (msg) => {  
+  console.log(msg)
+});
+*/
+
+//Modo inline
+bot.on('inline_query', msg => {
+  
+  if(!isDeckInline(msg))
+  {
+    let infoCardsProv = Database.searchCardByNameAll(msg.query) 
+
+    if(infoCardsProv.length > 0)
+    {
+      let listInlineQueryToSend = []
+      for(var i = 0; i < infoCardsProv.length; i++) {
+        var inlineQueryResultPhoto = {
+          id: infoCardsProv[i].cardCode,
+          type: "photo",
+          photo_url: infoCardsProv[i].imageUrl,
+          thumb_url: infoCardsProv[i].imageUrl,
+          title: infoCardsProv[i].name,
+          photo_height: 70,
+          photo_width: 48
+          
+        }
+        listInlineQueryToSend.push(inlineQueryResultPhoto)
+        if(i == 49)
+          break;
+      };
+      bot.answerInlineQuery(msg.id, listInlineQueryToSend)
+    }
+    else
+    {           
+      bot.answerInlineQuery(msg.id, [
+        {
+          id: '0',
+          type: "article",
+          title: "Error",
+          description: "No se ha encontrado ninguna carta ni deck",
+          message_text: "No se ha encontrado ninguna carta ni deck"
+        }
+      ]);
+    }
+  }
+
+})
+
+function isDeckInline(msg)
+{
+  var deck = DeckEncoder.decode(msg.query)
+  if(deck == "InvalidDeck" || !deck)
+    return false
+  else
+  {
+    try
+    {
+      deck = Database.sortDeckByElixir(deck)   
+
+      DeckImage.createDeckImage(deck).then((htmlCode) => {
+        const promise = nodeHtmlToImage({
+          html: htmlCode,
+          puppeteerArgs: { args: ['--no-sandbox'] } 
+        });
+        promise.then((img) => {
+          //-437983251 es el ID del grupo donde escupe los resultados
+          var promise2 = bot.sendPhoto(-437983251, img)
+          promise2.then((result) => {
+            bot.answerInlineQuery(msg.id, [
+              {
+                id: '0',
+                type: "photo",
+                photo_file_id: result.photo[1].file_id
+              }
+            ]);
+          })
+        })
+      })      
+    }
+    catch(error)
+    {
+      return false
+    }    
+  }
+  return true
+}
+
 
 
 //Comandos para buscar decks
@@ -84,22 +168,24 @@ function searchDeckCommand(msg, match)
     {
       deck = Database.sortDeckByElixir(deck)   
 
-      const promise = nodeHtmlToImage({
-        html: DeckImage.createDeckImage(deck),
-        puppeteerArgs: { args: ['--no-sandbox'] } 
-      });
-      promise.then((img) => {
-        //console.log(img)
-        bot.sendPhoto(chatId, img)
-      })
+      
+      DeckImage.createDeckImage(deck).then((htmlCode) => {
+        //console.log(htmlCode)
+        const promise =  nodeHtmlToImage({
+          html: htmlCode,
+          puppeteerArgs: { args: ['--no-sandbox'] } 
+        });
+        promise.then((img) => {
+          //console.log(img)
+          bot.sendPhoto(chatId, img)
+        })
+      }) 
     }
     catch(error)
     {
       bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
-    }
-    
+    } 
   }
-
 }
 
 
