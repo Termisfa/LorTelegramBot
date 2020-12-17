@@ -13,8 +13,7 @@ const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
 const nodeHtmlToImage = require('node-html-to-image')
 
 // replace the value below with the Telegram token you receive from @BotFather
-const token = "1336055457:AAHmjUZ0xHbpS3pPytR8luhixlFsvBEc_Cs"
-//const token = process.env.BotToken
+const token = process.env.BotToken
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
@@ -48,6 +47,8 @@ bot.onText(/^\/info/, (msg) => {
   var aux = "*Listado de comandos:* \n"
   aux += "`!Deck code`: Muestra imagen de un deck \n"
   aux += "`!Carta nombre`: Muestra carta buscada \n"
+  aux += "*Modo inline:* \n"
+  aux += "En cualquier chat (sin necesidad de que el bot esté dentro) usa @LorTermisBot seguido del nombre de una carta, o de el código de un deck. Después de esperar 2 o 3 segundos como mucho, aparecerá la imagen o imágenes como resultados. Selecciona el deseado, y el bot responderá en ese chat con la imagen."
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'})
 });
 
@@ -261,7 +262,7 @@ function mergeImagesAndSend(chatId, cardList)
 function checkCorrectName(infoCardsProv, msgReceived, chatId)
 {
   try { 
-    //Si no ha encontrado ninguna carta
+    //Si no ha encontrado ninguna carta 
     if(infoCardsProv.length == 0)
     {
       bot.sendMessage(chatId, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'") 
