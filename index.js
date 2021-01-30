@@ -13,7 +13,7 @@ const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
 const nodeHtmlToImage = require('node-html-to-image')
 
 // replace the value below with the Telegram token you receive from @BotFather
-const token = process.env.BotToken
+const token = '1695131446:AAGDwTyVookIB6V53q0DOE0DCY9S1iJXBBI'
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
