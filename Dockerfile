@@ -1,22 +1,12 @@
-FROM node
+FROM zenika/alpine-chrome:with-node
 
-
-WORKDIR /testDocker
-
-COPY package*.json ./
-
-#ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD 1
-#ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
-
-#RUN apt-get update
-#RUN apt-get install chromium -y
-
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD 1
+ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
+WORKDIR /usr/src/app
+COPY --chown=chrome package.json package-lock.json ./
 RUN npm install
-
-COPY . .
-
-CMD node index.js
-
-# EXPOSE 8081
+COPY --chown=chrome . ./
+ENTRYPOINT ["tini", "--"]
+CMD ["node", "index"]
 	
 	
