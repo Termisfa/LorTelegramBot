@@ -46,6 +46,35 @@ class DeckImage
             return htmlString
          })();
     } 
+
+    
+    static createDeckImageVertical(deckList)
+    {
+        cardMostUsed = 0
+        cardsRegion = CardsRegion.from()
+        
+        return (async() =>  {
+            htmlString = ""
+            htmlString += "<html>"
+            htmlString += "<head><style>"
+            await readFileCSS().then((data) => htmlString += data)
+            htmlString += "</style></head>"
+            htmlString += "<body><div class='imgBackg'></div><div class='content'>"
+            htmlString += "<div class='columnV' id='columnV'>"
+            htmlString += createDivVertical(deckList)
+            htmlString += "</div></div></body></html>"
+
+            //Sustituimos el placeholder de regiones
+            htmlString = htmlString.replace("placeholderRegions", createDivRegions())
+
+            //Reemplazamos el height del body según el tipo de carta más usada
+            cardMostUsed = cardMostUsed * 43
+            if(cardMostUsed > 550)
+                htmlString = htmlString.replace("body {width: 1000px;height: 550px;", "body {width: 300px;height: " + cardMostUsed + "px;")
+
+            return htmlString
+         })();
+    }
 }
 
 //Lee el css y devuelve una promesa, cuando se resuelva será el String del CSS
@@ -58,6 +87,31 @@ function readFileCSS()
     catch (error) {
         console.log("Error :" + error)
     }   
+}
+
+function createDivVertical(deckList)
+{
+    var divString = ""
+    var countAll = 0
+    var countDifferent = 1
+    deckList.forEach(cardInDeck => {
+        countDifferent ++
+        divString += createDivCard(cardInDeck)
+        countAll += cardInDeck.count           
+        cardsRegion.pushCard(cardInDeck.card.faction, cardInDeck.count)         
+    });
+    divString += "</div>"
+
+    if(cardMostUsed < countDifferent)
+        cardMostUsed = countDifferent
+
+    //Agregamos al inicio de la cadena
+    //divString = divString.replace(/^/, "<div><div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>" + selectNameForTitle(typeOfCard) + " " + countAll + "</div><div class = 'titleLineRight'></div></div>")
+    
+    if(countAll == 0)
+        return ""
+
+    return divString
 }
 
 //Devuelve el div completo en String de las cartas
@@ -94,6 +148,7 @@ function createDiv(deckList, typeOfCard)
 //Devuelve el div completo en String de una carta
 function createDivCard(cardInDeck)
 {
+    //console.log(cardInDeck)
     var color = colorRegion.getColorRgb(cardInDeck.card.cardCode.slice(2,4))
     var divString = "<div class='boxImg'>"
     divString += "<div class='image' style='background: linear-gradient(90deg, rgb(" + color + ") 35%, rgba(" + color + ", 0) 70%), url(https://cdn-lor.mobalytics.gg/production/images/cards-preview/" + cardInDeck.card.cardCode + ".webp) right center no-repeat;'>"

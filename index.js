@@ -156,6 +156,20 @@ bot.onText(/^\!d (.+)/, (msg, match) => {
   searchDeckCommand(msg, match)
 });
 
+//Comandos para buscar decks
+bot.onText(/^\!Vertical (.+)/, (msg, match) => {
+  searchDeckCommandVertical(msg, match)
+});
+bot.onText(/^\!vertical (.+)/, (msg, match) => {
+  searchDeckCommandVertical(msg, match)
+});
+bot.onText(/^\!V (.+)/, (msg, match) => {
+  searchDeckCommandVertical(msg, match)
+});
+bot.onText(/^\!v (.+)/, (msg, match) => {
+  searchDeckCommandVertical(msg, match)
+});
+
 //Para buscar decks
 function searchDeckCommand(msg, match)
 {
@@ -172,6 +186,37 @@ function searchDeckCommand(msg, match)
 
       
       DeckImage.createDeckImage(deck).then((htmlCode) => {
+        //console.log(htmlCode)
+        const promise =  nodeHtmlToImage({
+          html: htmlCode,
+          puppeteerArgs: { args: ['--no-sandbox'] } 
+        });
+        promise.then((img) => {
+          //console.log(img)
+          bot.sendPhoto(chatId, img)
+        })
+      }) 
+    }
+    catch(error)
+    {
+      bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+    } 
+  }
+}
+
+function searchDeckCommandVertical(msg, match)
+{
+  const chatId = msg.chat.id;
+
+  var deck = DeckEncoder.decode(match[1])
+  if(deck == "InvalidDeck" || !deck)
+    bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+  else
+  {
+    try
+    {     
+      deck = Database.sortDeckByElixir(deck) 
+      DeckImage.createDeckImageVertical(deck).then((htmlCode) => {
         //console.log(htmlCode)
         const promise =  nodeHtmlToImage({
           html: htmlCode,
