@@ -58,6 +58,17 @@ bot.on("message", (msg) => {
 });
 */
 
+//Comando para actualizar la base de datos
+bot.onText(/^\!update$/, (msg, match) => {
+  const chatId = msg.chat.id;
+  //Solo se puede actualizar con mi id (78306827) o desde el grupo de inline (-437983251)
+  if(chatId == -437983251 || msg.from.id == 78306827) 
+   {
+    Database.update()
+    bot.sendMessage(chatId, "Database actualizada")
+   } 
+});
+
 //Modo inline
 bot.on('inline_query', msg => {
   

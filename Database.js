@@ -1,14 +1,20 @@
-
+const fs = require('fs');
 
 const CardInfo = require('./CardInfo')
 
-const allCardsInfo = require('./allSets-es_es.json')
-const allCardsInfoEng = require('./allSets-en_us.json')
+var allCardsInfo = require('./allSets-es_es.json')
+var allCardsInfoEng = require('./allSets-en_us.json')
 
 
 
 class Database
 {
+    //Actualiza los datos desde los json
+    static update() 
+    {
+        allCardsInfo = JSON.parse(fs.readFileSync('./allSets-es_es.json'));
+        allCardsInfoEng = JSON.parse(fs.readFileSync('./allSets-en_us.json'));        
+    }
     //Devuelve una lista de cartas coleccionables con todas las que contengan un string
     static searchCardByName(cardName)
     {
