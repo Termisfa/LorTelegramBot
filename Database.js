@@ -1,19 +1,34 @@
+'use strict';
+const admZip = require('adm-zip');
+const request = require('superagent');
 const fs = require('fs');
 
 const CardInfo = require('./CardInfo')
+const indexJs = require("./index");
 
-var allCardsInfo = require('./allSets-es_es.json')
-var allCardsInfoEng = require('./allSets-en_us.json')
+var allCardsInfo = require('./allSetsEsp.json')
+var allCardsInfoEng = require('./allSetsEng.json')
+var arrayDataEsp
+var arrayDataEng
+var size;
 
 
 
 class Database
 {
     //Actualiza los datos desde los json
-    static update() 
+    static update(number) 
     {
-        allCardsInfo = JSON.parse(fs.readFileSync('./allSets-es_es.json'));
-        allCardsInfoEng = JSON.parse(fs.readFileSync('./allSets-en_us.json'));        
+        size = number;
+        arrayDataEsp = new Array()
+        for(var i = 0; i < number; i++)
+            downloadUnzipEsp(i + 1);
+
+        arrayDataEng = new Array()
+        for(var i = 0; i < number; i++)
+            downloadUnzipEng(i + 1);
+
+        
     }
     //Devuelve una lista de cartas coleccionables con todas las que contengan un string
     static searchCardByName(cardName)
@@ -129,12 +144,126 @@ function removeAccents(text)
 
 
 
-module.exports = Database
-
-/*
-//Para tests
-app.listen(3000, function() {
-    console.log(Database.searchCardById('01PZ040T2'))
-    console.log('Telegram app listening on port 3000!')
+function downloadUnzipEsp(number)
+{
+  console.log("Empieza esp " + number)
+  var downloadSave = "./set" + number + "Esp.zip"
+  request
+  .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
+  .on('error', function(error) {
+    console.log(error);
   })
-*/
+  .pipe(fs.createWriteStream(downloadSave))
+  .on('finish', function() {
+    console.log('finished downloading esp ' + number);
+    var zip = new admZip(downloadSave);
+    console.log('start unzip esp ' + number);
+    zip.extractEntryTo("es_es/data/set"+ number + "-es_es.json", "./", false, true);
+    console.log('finished unzip esp ' + number);        
+  })
+  .on('close', function() {
+      fs.readFile("./set" + number + "-es_es.json", function(err, data){
+        if(err)
+        {
+          console.log(err)
+        }
+        arrayDataEsp.push(data);
+        readFinishedEsp()
+      })
+    })
+}
+
+function readFinishedEsp()
+{
+  console.log("Finalizados esp " + arrayDataEsp.length);
+  if(arrayDataEsp.length == size)
+  {
+    var data = "";
+    for(var i = 0; i < size; i++)
+    {
+      data += arrayDataEsp[i];
+      fs.promises.unlink("./set" + (i + 1) + "Esp.zip")
+        .catch(err => {
+          console.error('Something wrong happened removing the file', err)
+        })
+      fs.promises.unlink("./set" + (i + 1) + "-es_es.json")
+        .catch(err => {
+          console.error('Something wrong happened removing the file', err)
+        })
+    }    
+    
+    data = data.split('][').join(',');
+    fs.writeFile('./allSetsEsp.json', data, () => { 
+        console.log("Terminado esp")
+        allCardsInfo = JSON.parse(fs.readFileSync('./allSetsEsp.json'));
+    } );
+  }
+}
+
+
+
+function downloadUnzipEng(number)
+{
+  var downloadSave = "./set" + number + "Eng.zip"
+  console.log("Empieza eng " + number)
+  request
+  .get('https://dd.b.pvp.net/latest/set' + number + '-lite-en_us.zip')
+  .on('error', function(error) {
+    console.log(error);
+  })
+  .pipe(fs.createWriteStream(downloadSave))
+  .on('finish', function() {
+    console.log('finished downloading eng ' + number);
+    var zip = new admZip(downloadSave);
+    console.log('start unzip eng ' + number);
+    zip.extractEntryTo("en_us/data/set"+ number + "-en_us.json", "./", false, true);
+    console.log('finished unzip eng ' + number);        
+  })
+  .on('close', function() {
+      fs.readFile("./set" + number + "-en_us.json", function(err, data){
+        if(err)
+        {
+          console.log(err)
+        }
+        arrayDataEng.push(data);
+        readFinishedEng()
+      })
+    })
+}
+
+function readFinishedEng()
+{
+  console.log("Finalizados eng " + arrayDataEng.length);
+  if(arrayDataEng.length == size)
+  {
+    var data = "";
+    for(var i = 0; i < size; i++)
+    {
+      data += arrayDataEng[i];
+      fs.promises.unlink("./set" + (i + 1) + "Eng.zip")
+        .catch(err => {
+          console.error('Something wrong happened removing the file', err)
+        })
+      fs.promises.unlink("./set" + (i + 1) + "-en_us.json")
+        .catch(err => {
+          console.error('Something wrong happened removing the file', err)
+        })
+    }    
+    
+    data = data.split('][').join(',');
+    fs.writeFile('./allSetsEng.json', data, () => {
+        console.log("Terminado eng")
+        allCardsInfoEng = JSON.parse(fs.readFileSync('./allSetsEng.json'));        
+     } );
+  }
+}
+
+
+function test(chatId, message, bot)
+{
+  bot.sendMessage(chatId, message)
+}
+
+
+module.exports = {Database, test}
+

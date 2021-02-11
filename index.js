@@ -25,8 +25,12 @@ bot.ed
 
 //Para hacer tests
 bot.onText(/^\!t (.+)/, (msg, match) => {
-    
+   Database.test(msg.chat.id, match[1], bot) 
 });
+
+
+
+
 
 
 
@@ -46,6 +50,7 @@ bot.onText(/^\/info/, (msg) => {
   const chatId = msg.chat.id;
   var aux = "*Listado de comandos:* \n"
   aux += "`!Deck code`: Muestra imagen de un deck \n"
+  aux += "`!Vertical code`: Muestra imagen de un deck en vertical \n"
   aux += "`!Carta nombre`: Muestra carta buscada \n"
   aux += "*Modo inline:* \n"
   aux += "En cualquier chat (sin necesidad de que el bot esté dentro) usa @LorTermisBot seguido del nombre de una carta, o de el código de un deck. Después de esperar 2 o 3 segundos como mucho, aparecerá la imagen o imágenes como resultados. Selecciona el deseado, y el bot responderá en ese chat con la imagen."
@@ -64,7 +69,7 @@ bot.onText(/^\!update$/, (msg, match) => {
   //Solo se puede actualizar con mi id (78306827) o desde el grupo de inline (-437983251)
   if(chatId == -437983251 || msg.from.id == 78306827) 
    {
-    Database.update()
+    Database.update(3)
     bot.sendMessage(chatId, "Database actualizada")
    } 
 });
@@ -125,8 +130,8 @@ function isDeckInline(msg)
 
       DeckImage.createDeckImage(deck).then((htmlCode) => {
         const promise = nodeHtmlToImage({
-          html: htmlCode,
-          puppeteerArgs: { args: ['--no-sandbox'] } 
+          html: htmlCode,         
+          puppeteerArgs: {executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] } 
         });
         promise.then((img) => {
           //-437983251 es el ID del grupo donde escupe los resultados
@@ -200,7 +205,7 @@ function searchDeckCommand(msg, match)
         //console.log(htmlCode)
         const promise =  nodeHtmlToImage({
           html: htmlCode,
-          puppeteerArgs: { args: ['--no-sandbox'] } 
+          puppeteerArgs: {executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] } 
         });
         promise.then((img) => {
           //console.log(img)
@@ -231,7 +236,7 @@ function searchDeckCommandVertical(msg, match)
         //console.log(htmlCode)
         const promise =  nodeHtmlToImage({
           html: htmlCode,
-          puppeteerArgs: { args: ['--no-sandbox'] } 
+          puppeteerArgs: {executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] } 
         });
         promise.then((img) => {
           //console.log(img)
@@ -315,6 +320,8 @@ function mergeImagesAndSend(chatId, cardList)
   })
 }
 
+
+
 function checkCorrectName(infoCardsProv, msgReceived, chatId)
 {
   try { 
@@ -350,3 +357,11 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
   }
   return false
 }
+
+
+function sendMessage(chatId, message)
+{
+  bot.sendMessage(chatId, message)
+}
+
+module.exports =  {sendMessage};
