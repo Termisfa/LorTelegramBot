@@ -1,6 +1,26 @@
 const TelegramBot = require('node-telegram-bot-api');
-var Database = require('./Database')
+// replace the value below with the Telegram token you receive from @BotFather
+const token = '1695131446:AAGDwTyVookIB6V53q0DOE0DCY9S1iJXBBI'
+
+// Create a bot that uses 'polling' to fetch new updates
+const bot = new TelegramBot(token, {polling: true});
+
+const chatIdLogs = -333076382; //Id of the group LogBots
+
+function botLog(msg, error = false)
+ {
+    if(!error)
+      bot.sendMessage(chatIdLogs, msg)
+    else
+      bot.sendMessage(chatIdLogs, msg.response.body.description )
+ }
+
+var Database = require('./Database')(botLog)
 var DeckImage = require('./DeckImage')
+
+
+
+
 
 //Para juntar imágenes
 const mergeImg = require('merge-img')
@@ -12,27 +32,22 @@ const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
 //Para convertir html a imagen
 const nodeHtmlToImage = require('node-html-to-image')
 
-// replace the value below with the Telegram token you receive from @BotFather
-const token = '1695131446:AAGDwTyVookIB6V53q0DOE0DCY9S1iJXBBI'
 
-// Create a bot that uses 'polling' to fetch new updates
-const bot = new TelegramBot(token, {polling: true});
+
 
 //Listener para que enseñe errores de sintaxis
-bot.on("polling_error", console.log);
-bot.ed
-
-
-//Para hacer tests
-bot.onText(/^\!t (.+)/, (msg, match) => {
-   Database.test(msg.chat.id, match[1], bot) 
+bot.on("polling_error", (error) => {
+  botLog(error.response.body)
 });
 
 
 
-
-
-
+//Para hacer tests
+bot.onText(/^\!t (.+)/, (msg, match) => {
+  bot.sendMessage("hola", "hola").catch((error) => {
+    botLog(error)
+ })
+});
 
 
 
@@ -70,7 +85,6 @@ bot.onText(/^\!update$/, (msg, match) => {
   if(chatId == -437983251 || msg.from.id == 78306827) 
    {
     Database.update(3)
-    bot.sendMessage(chatId, "Database actualizada")
    } 
 });
 
@@ -352,8 +366,8 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
     //Si todo es correcto
     return true
   } catch (error) {
-    console.log("Error en checkCorrectName")
-    console.log(error)
+    botLog("Error en checkCorrectName")
+    botLog(error)
   }
   return false
 }
@@ -364,4 +378,3 @@ function sendMessage(chatId, message)
   bot.sendMessage(chatId, message)
 }
 
-module.exports =  {sendMessage};
