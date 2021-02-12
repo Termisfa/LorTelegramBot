@@ -1,4 +1,4 @@
-const bot = require('./bot');
+
 
 module.exports = function(botLog){
   'use strict';
@@ -7,7 +7,6 @@ module.exports = function(botLog){
   const fs = require('fs');
   
   const CardInfo = require('./CardInfo')
-  const indexJs = require("./index");
   
   var allCardsInfo = require('./allSetsEsp.json')
   var allCardsInfoEng = require('./allSetsEng.json')
@@ -23,17 +22,18 @@ module.exports = function(botLog){
       //Actualiza los datos desde los json
       static update(number) 
       {
-          size = number;
-          arrayDataEsp = new Array()
-          for(var i = 0; i < number; i++)
-              downloadUnzipEsp(i + 1);
-  
-          arrayDataEng = new Array()
-          for(var i = 0; i < number; i++)
-              downloadUnzipEng(i + 1);
-  
-          
+        botLog("Iniciadas descargas")
+
+        size = number;
+        arrayDataEsp = new Array()
+        for(var i = 0; i < number; i++)
+            downloadUnzipEsp(i + 1);
+
+        arrayDataEng = new Array()
+        for(var i = 0; i < number; i++)
+            downloadUnzipEng(i + 1);          
       }
+
       //Devuelve una lista de cartas coleccionables con todas las que contengan un string
       static searchCardByName(cardName)
       {
@@ -60,32 +60,34 @@ module.exports = function(botLog){
           });
           return infoCardsProv
       }
-          //Devuelve una lista de cartas con todas las que contengan un string, incluídas las no coleccionables
-          static searchCardByNameAll(cardName)
-          {
-              let infoCardsProv = []
-              cardName = cardName.toLowerCase()
-              cardName = removeAccents(cardName)
-              //Busca las cartas en español
-              allCardsInfo.forEach(card => {
-                  if(removeAccents(card.name.toLowerCase()).includes(cardName))
-                      infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
-              });
-              //Busca las cartas en inglés, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
-              allCardsInfoEng.forEach(card => {
-                  if(removeAccents(card.name.toLowerCase()).includes(cardName))
-                  {
-                      let bool = false
-                      infoCardsProv.forEach(element => {
-                          if(card.cardCode == element.cardCode)
-                              bool = true
-                      });
-                      if(!bool)
-                          infoCardsProv.push(this.searchCardById(card.cardCode))
-                  }   
-              });
-              return infoCardsProv
-          }
+
+      //Devuelve una lista de cartas con todas las que contengan un string, incluídas las no coleccionables
+      static searchCardByNameAll(cardName)
+      {
+          let infoCardsProv = []
+          cardName = cardName.toLowerCase()
+          cardName = removeAccents(cardName)
+          //Busca las cartas en español
+          allCardsInfo.forEach(card => {
+              if(removeAccents(card.name.toLowerCase()).includes(cardName))
+                  infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
+          });
+          //Busca las cartas en inglés, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
+          allCardsInfoEng.forEach(card => {
+              if(removeAccents(card.name.toLowerCase()).includes(cardName))
+              {
+                  let bool = false
+                  infoCardsProv.forEach(element => {
+                      if(card.cardCode == element.cardCode)
+                          bool = true
+                  });
+                  if(!bool)
+                      infoCardsProv.push(this.searchCardById(card.cardCode))
+              }   
+          });
+          return infoCardsProv
+      }
+
       //Devuelve la carta que coincida con un ID
       static searchCardById(cardId)
       {
@@ -150,7 +152,6 @@ module.exports = function(botLog){
   
   function downloadUnzipEsp(number)
   {
-    botLog("Iniciada descarga Esp " + number)
     var downloadSave = "./set" + number + "Esp.zip"
     request
     .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
