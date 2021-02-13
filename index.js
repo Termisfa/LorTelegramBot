@@ -1,26 +1,30 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 const TelegramBot = require('node-telegram-bot-api');
 // replace the value below with the Telegram token you receive from @BotFather
-const token = '1695131446:AAGDwTyVookIB6V53q0DOE0DCY9S1iJXBBI'
+const token = process.env.BOT_TOKEN
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
 const chatIdLogs = -333076382; //Id of the group LogBots
 
+
 function botLog(msg, method, error = false)
  {
     if(!error)
-      bot.sendMessage(chatIdLogs, msg + "\n")
+      bot.sendMessage(chatIdLogs, msg + "\n").catch((error) => {
+        console.log(error)
+     })
     else
-      bot.sendMessage(chatIdLogs, "ERROR EN " + method + ":\n" + msg +"\n")
+      bot.sendMessage(chatIdLogs, "ERROR EN " + method + ":\n" + msg +"\n").catch((error) => {
+        console.log(error)
+     })
  }
 
 var Database = require('./Database')(botLog)
 var DeckImage = require('./DeckImage')
-
-
-
-
 
 //Para juntar imágenes
 const mergeImg = require('merge-img')
@@ -32,28 +36,24 @@ const  DeckEncoder  = require('./DeckDecoder/DeckEncoder')
 //Para convertir html a imagen
 const nodeHtmlToImage = require('node-html-to-image')
 
-
-
-/*
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", (error) => {
-  botLog(error.response.body)
+  botLog(error, "PollingError", true)
 });
-*/
+
 
 
 //Para hacer tests
-bot.onText(/^\!t (.+)/, (msg, match) => {
-  bot.sendMessage("hola", "hola").catch((error) => {
-    botLog(error.response.body.description, "test", true)
- })
+bot.onText(/^\!t (.+)/i, (msg, match) => {
+  if(checkAdmin(msg))
+    Database.checkIfUpdated()
 });
 
 
 
 
 //Comando para cafe
-bot.onText(/^\/cafe/, (msg) => {  
+bot.onText(/^\/cafe/i, (msg) => {  
   const chatId = msg.chat.id;
   var aux = "Te gusta este bot? Me puedes ayudar donando una pequeña cantidad de dinero por Paypal, "
   aux += "o simplemente compartirlo en otros grupos y redes sociales. Muchas gracias!! paypal.me/Termisfa"
@@ -63,7 +63,7 @@ bot.onText(/^\/cafe/, (msg) => {
 });
 
 //Comando para info
-bot.onText(/^\/info/, (msg) => {  
+bot.onText(/^\/info/i, (msg) => {  
   const chatId = msg.chat.id;
   var aux = "*Listado de comandos:* \n"
   aux += "`!Deck code`: Muestra imagen de un deck \n"
@@ -77,20 +77,70 @@ bot.onText(/^\/info/, (msg) => {
 });
 
 /*
+//Para conseguir la info de un mensaje
 bot.on("message", (msg) => {  
   console.log(msg)
 });
 */
 
-//Comando para actualizar la base de datos
-bot.onText(/^\!update$/, (msg, match) => {
-  const chatId = msg.chat.id;
-  //Solo se puede actualizar con mi id (78306827) o desde el grupo de inline (-437983251)
-  if(chatId == -437983251 || msg.from.id == 78306827) 
-   {
-    Database.update(3)
-   } 
+var intervalActivated = true
+var interval = setInterval(() => Database.checkIfUpdated(), 86400000) //Cada día 86400000
+
+//Comando para activar o desactivar las actualizaciones automáticas
+bot.onText(/^\!auto$/i, (msg, match) => {
+  if(checkAdmin(msg))
+  {
+    if(intervalActivated)
+      clearInterval(interval)
+    else
+      interval = setInterval(() => Database.checkIfUpdated(), 86400000)
+    
+    interval = !interval
+    bot.sendMessage(msg.chat.id, "Ahora las actualizaciones automáticas están " + (interval ? "activadas" : "desactivadas")).catch((error) => {
+      botLog(error.response.body.description, "auto", true)
+   })
+  }
 });
+
+//Comando para mirar si están activadas las actualizaciones automáticas
+bot.onText(/^\!checkauto$/i, (msg, match) => {
+  if(checkAdmin(msg))
+    bot.sendMessage(msg.chat.id, "Las actualizaciones automáticas están " + (interval ? "activadas" : "desactivadas")).catch((error) => {
+      botLog(error.response.body.description, "checkauto", true)
+   })
+});
+
+//Comando para actualizar la base de datos
+bot.onText(/^\!update$/i, (msg, match) => {
+  if(checkAdmin(msg))
+  {
+    Database.update()
+    bot.sendMessage(msg.chat.id, "Iniciada actualización").catch((error) => {
+      botLog(error.response.body.description, "update", true)
+   })
+  }
+});
+
+//Comando para forzar el número de sets actuales
+bot.onText(/^\!sets (.+)/i, (msg, match) => {
+  if(checkAdmin(msg))
+  {
+    var text = match[0]
+    if(!isNaN(text))
+    {
+      Database.forceSets(parseInt(text))
+      bot.sendMessage(msg.chat.id, "Sets cambiados a " + text).catch((error) => {
+        botLog(error.response.body.description, "sets", true)
+     })
+    }
+    else
+      bot.sendMessage(msg.chat.ig, "Error, '" + text + "' no es un número válido").catch((error) => {
+        botLog(error.response.body.description, "sets", true)
+     })
+  }
+});
+
+
 
 //Modo inline
 bot.on('inline_query', msg => {
@@ -198,30 +248,18 @@ function isDeckInline(msg)
 
 
 //Comandos para buscar decks
-bot.onText(/^\!Deck (.+)/, (msg, match) => {
+bot.onText(/^\!Deck (.+)/i, (msg, match) => {
   searchDeckCommand(msg, match)
 });
-bot.onText(/^\!deck (.+)/, (msg, match) => {
-  searchDeckCommand(msg, match)
-});
-bot.onText(/^\!D (.+)/, (msg, match) => {
-  searchDeckCommand(msg, match)
-});
-bot.onText(/^\!d (.+)/, (msg, match) => {
+bot.onText(/^\!D (.+)/i, (msg, match) => {
   searchDeckCommand(msg, match)
 });
 
 //Comandos para buscar decks
-bot.onText(/^\!Vertical (.+)/, (msg, match) => {
+bot.onText(/^\!Vertical (.+)/i, (msg, match) => {
   searchDeckCommandVertical(msg, match)
 });
-bot.onText(/^\!vertical (.+)/, (msg, match) => {
-  searchDeckCommandVertical(msg, match)
-});
-bot.onText(/^\!V (.+)/, (msg, match) => {
-  searchDeckCommandVertical(msg, match)
-});
-bot.onText(/^\!v (.+)/, (msg, match) => {
+bot.onText(/^\!V (.+)/i, (msg, match) => {
   searchDeckCommandVertical(msg, match)
 });
 
@@ -232,7 +270,9 @@ function searchDeckCommand(msg, match)
 
   var deck = DeckEncoder.decode(match[1])
   if(deck == "InvalidDeck" || !deck)
-    bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'})
+    bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'}).catch((error) => {
+      botLog(error.response.body.description, "searchDeckCommand", true)
+   })
   else
   {
     try
@@ -314,16 +354,10 @@ function searchDeckCommandVertical(msg, match)
 
 
 //Comandos para buscar cartas
-bot.onText(/^\!Carta (.+)/, (msg, match) => {
+bot.onText(/^\!Carta (.+)/i, (msg, match) => {
   searchCardCommand(msg, match)
 });
-bot.onText(/^\!carta (.+)/, (msg, match) => {
-  searchCardCommand(msg, match)
-});
-bot.onText(/^\!C (.+)/, (msg, match) => {
-  searchCardCommand(msg, match)
-});
-bot.onText(/^\!c (.+)/, (msg, match) => {
+bot.onText(/^\!C (.+)/i, (msg, match) => {
   searchCardCommand(msg, match)
 });
 
@@ -355,7 +389,7 @@ function searchCardCommand(msg, match)
 
 
 //Actualizar comandos
-bot.onText(/^\/updateCommands$/, (msg) => {  
+bot.onText(/^\/updateCommands$/i, (msg) => {  
   const chatId = msg.chat.id;
   const opts = [
     {command: 'info', description: 'Info sobre comandos'},
@@ -399,7 +433,9 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
     //Si no ha encontrado ninguna carta 
     if(infoCardsProv.length == 0)
     {
-      bot.sendMessage(chatId, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'") 
+      bot.sendMessage(chatId, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'").catch((error) => {
+        botLog(error.response.body.description, "checkCorrectName", true)
+     })
       return false
     }
     //Si ha encontrado más de 5 cartas que contenga ese nombre
@@ -417,7 +453,9 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
         //Quitamos la coma y el espacio final
         aux.substring(0, aux.length - 2)
       }
-      bot.sendMessage(chatId, aux)
+      bot.sendMessage(chatId, aux).catch((error) => {
+        botLog(error.response.body.description, "checkCorrectName", true)
+     })
       return false
     }
     //Si todo es correcto
@@ -428,9 +466,13 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
   return false
 }
 
-
-function sendMessage(chatId, message)
+//Devuelve true si el usuario tiene permisos de admin
+function checkAdmin(msg)
 {
-  bot.sendMessage(chatId, message)
+  //Mi id (78306827), grupo de inline (-437983251), grupo de logs (chatIdLogs)
+  if(msg.chat.id == -437983251 || msg.from.id == 78306827 || msg.from.id == chatIdLogs) 
+    return true;
+  else
+    return false 
 }
 

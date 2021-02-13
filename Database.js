@@ -2,36 +2,44 @@
 
 module.exports = function(botLog){
   'use strict';
-  const admZip = require('adm-zip');
   const request = require('superagent');
+  var yauzl = require("yauzl");
   const fs = require('fs');
   
   const CardInfo = require('./CardInfo')
   
   var allCardsInfo = require('./allSetsEsp.json')
   var allCardsInfoEng = require('./allSetsEng.json')
+
+  var lastModifiedZip = new Date()
+  var sets = 3 //Cantidad de sets actuales
+
+
+
   var arrayDataEsp
   var arrayDataEng
-  var size;
   
   
   
   
   class Database
   {
-      //Actualiza los datos desde los json
-      static update(number) 
+      //Fuerza los sets actuales al número de entrada
+      static forceSets(number)
       {
-        botLog("Iniciadas descargas")
+        sets = number
+      }
 
-        size = number;
+      //Actualiza los datos desde los json
+      static update(number = (sets + 1)) 
+      {
         arrayDataEsp = new Array()
         for(var i = 0; i < number; i++)
-            downloadUnzipEsp(i + 1);
+            downloadEsp(i + 1);
 
         arrayDataEng = new Array()
         for(var i = 0; i < number; i++)
-            downloadUnzipEng(i + 1);          
+            downloadEng(i + 1);          
       }
 
       //Devuelve una lista de cartas coleccionables con todas las que contengan un string
@@ -130,6 +138,48 @@ module.exports = function(botLog){
           }        
           return deckSorted
       }
+
+      //Descarga el último set, comprueba su fecha, y si es diferente a la actual hace update
+      static checkIfUpdated(number = sets)
+      {
+        try
+        {
+          var downloadSave = "./test.zip"    
+    
+          request
+          .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
+          .on('error', function(error) {
+            botLog(error, "checkIfUpdated", true)
+          })
+          .pipe(fs.createWriteStream(downloadSave))
+          .on('finish', function() 
+          {
+            yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
+              if (error) 
+                botLog(error, "checkIfUpdated", true)
+              else
+              {
+                zipfile.readEntry();
+                zipfile.on("entry", function(entry) {        
+                  if(lastModifiedZip.getTime() == entry.getLastModDate().getTime())    
+                    botLog("Los json están al día") 
+                  else
+                  {
+                    lastModifiedZip = entry.getLastModDate()
+                    botLog("Los json no están al día, iniciando actualización")
+                    Database.update()
+                  }        
+                  zipfile.close()             
+                })
+              }  
+              fs.promises.unlink(downloadSave).catch(error => {
+                botLog(error, "checkIfUpdated", true)
+              })            
+            })
+          })
+        }
+        catch (error)  {  botLog(error, "checkIfUpdated", true)   }   
+      }
   }
   
   //Devuelve qué tipo de carta es
@@ -150,113 +200,210 @@ module.exports = function(botLog){
   
   
   
-  function downloadUnzipEsp(number)
+  function downloadEsp(number)
   {
-    var downloadSave = "./set" + number + "Esp.zip"
-    request
-    .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
-    .on('error', function(error) {
-      console.log(error);
-    })
-    .pipe(fs.createWriteStream(downloadSave))
-    .on('finish', function() {
-      botLog("Terminada descarga Esp " + number)
-      var zip = new admZip(downloadSave);
-      zip.extractEntryTo("es_es/data/set"+ number + "-es_es.json", "./", false, true);
-    })
-    .on('close', function() {
-        fs.readFile("./set" + number + "-es_es.json", function(err, data){
-          if(err)
-          {
-            console.log(err)
-          }
-          arrayDataEsp.push(data);
-          readFinishedEsp()
-        })
+    try {
+      var downloadSave = "./set" + number + "Esp.zip"
+      var jsonSave = "set" + number + "-es_es.json"
+
+
+      request
+      .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
+      .on('error', function(error) {
+        botLog(error, "downloadEsp", true)
       })
+      .pipe(fs.createWriteStream(downloadSave))
+      .on('finish', function() {
+        unzipEsp(jsonSave, downloadSave, number)
+      })
+    }
+    catch (error)  {  botLog(error, "unzipEsp", true)   }   
+    
   }
+
+  function unzipEsp(jsonSave, downloadSave, number)
+  {
+    try 
+    {
+      yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
+        if (error) 
+          fs.promises.unlink(downloadSave).catch(error => {
+            botLog(error, "unzipEsp", true)
+          })        
+        else
+        {
+          //En caso de que se descargue un nuevo set por primera vez
+          if(sets < number)
+          {
+            botLog("Se ha aumentado el número de sets a " + number)
+            sets = number
+          }
+
+          zipfile.readEntry();
+          zipfile.on("entry", function(entry) {        
+          if(entry.fileName == ( "es_es/data/" + jsonSave)) 
+          {
+            zipfile.openReadStream(entry, function(error, readStream) {
+                if (error) 
+                  botLog(error, "unzipEsp", true)
+                else
+                {                      
+                  readStream.pipe(fs.createWriteStream(jsonSave));
+                  readStream.on("end", function() {
+                    //Ya está creado el json, aquí lo leemos y guardamos en el array
+                    fs.readFile(jsonSave, function(error, data){
+                      if(error)
+                        botLog(error, "unzipEsp", true)
+                      else
+                      {
+                        arrayDataEsp.push(data);
+                        readFinishedEsp()
+                      }                          
+                    })
+                  })
+                }                  
+              });
+              zipfile.close()
+            }
+            else
+                zipfile.readEntry();              
+          })
+        }      
+      })
+    } 
+    catch (error)  {  botLog(error, "unzipEsp", true)   }    
+  }
+
   
   function readFinishedEsp()
   {
-    if(arrayDataEsp.length == size)
+    try
     {
-      var data = "";
-      for(var i = 0; i < size; i++)
+      if(arrayDataEsp.length == sets)
       {
-        data += arrayDataEsp[i];
-        fs.promises.unlink("./set" + (i + 1) + "Esp.zip")
-          .catch(err => {
-            botLog('Something wrong happened removing the file ' + err)
-          })
-        fs.promises.unlink("./set" + (i + 1) + "-es_es.json")
-          .catch(err => {
-            botLog('Something wrong happened removing the file ' + err)
-          })
-      }    
-      
-      data = data.split('][').join(',');
-      fs.writeFile('./allSetsEsp.json', data, () => { 
-          botLog("Terminado proceso de update en español")
-          allCardsInfo = JSON.parse(fs.readFileSync('./allSetsEsp.json'));
-      } );
+        var data = "";
+        for(var i = 0; i < sets; i++)
+        {
+          data += arrayDataEsp[i];
+          fs.promises.unlink("./set" + (i + 1) + "Esp.zip").catch(error => {
+              botLog(error, "readFinishedEsp", true)
+            })
+          fs.promises.unlink("./set" + (i + 1) + "-es_es.json").catch(error => {
+             botLog(error, "readFinishedEsp", true)
+            })
+        }
+        
+        data = data.split('][').join(',');
+        fs.writeFile('./allSetsEsp.json', data, () => { 
+            botLog("Terminado proceso de update en español")
+            allCardsInfo = JSON.parse(fs.readFileSync('./allSetsEsp.json'));
+        } );
+      }
     }
+    catch (error)  {  botLog(error, "readFinishedEsp", true)   }    
   }
   
   
   
-  function downloadUnzipEng(number)
+  function downloadEng(number)
   {
-    var downloadSave = "./set" + number + "Eng.zip"
-    botLog("Iniciada descarga Eng " + number)
-    request
-    .get('https://dd.b.pvp.net/latest/set' + number + '-lite-en_us.zip')
-    .on('error', function(error) {
-      console.log(error);
-    })
-    .pipe(fs.createWriteStream(downloadSave))
-    .on('finish', function() {
-      botLog("Terminada descarga Eng " + number)
-      var zip = new admZip(downloadSave);
-      zip.extractEntryTo("en_us/data/set"+ number + "-en_us.json", "./", false, true);     
-    })
-    .on('close', function() {
-        fs.readFile("./set" + number + "-en_us.json", function(err, data){
-          if(err)
-          {
-            console.log(err)
-          }
-          arrayDataEng.push(data);
-          readFinishedEng()
-        })
-      })
-  }
+    try
+    {
+      var downloadSave = "./set" + number + "Eng.zip"
+      var jsonSave = "set" + number + "-en_us.json"
   
+  
+      request
+      .get('https://dd.b.pvp.net/latest/set' + number + '-lite-en_us.zip')
+      .on('error', function(error) {
+        botLog(error, "downloadEng", true) 
+      })
+      .pipe(fs.createWriteStream(downloadSave))
+      .on('finish', function() {
+        unzipEng(jsonSave, downloadSave)     
+      })
+    }
+    catch (error)  {  botLog(error, "downloadEng", true)   }    
+  }
+
+  function unzipEng(jsonSave, downloadSave)
+  {
+    try 
+    {
+      yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
+        if (error) 
+        {
+          fs.promises.unlink(downloadSave).catch(error => {
+            botLog(error, "unzipEng", true)
+          }) 
+        }                 
+        else
+        {
+          zipfile.readEntry();
+          zipfile.on("entry", function(entry) {        
+            if(entry.fileName == ("en_us/data/" + jsonSave))
+            {
+              zipfile.openReadStream(entry, function(error, readStream) {
+                  if (error) 
+                    botLog(error, "unzipEng", true)
+                  else
+                  {                      
+                    readStream.pipe(fs.createWriteStream(jsonSave));
+                    readStream.on("end", function() {
+                      //Ya está creado el json, aquí lo leemos y guardamos en el array
+                      fs.readFile(jsonSave, function(error, data){
+                        if(error)
+                          botLog(error, "unzipEng", true)
+                        else
+                        {
+                          arrayDataEng.push(data);
+                          readFinishedEng()
+                        }                          
+                      })
+                    })
+                  }                  
+                });
+                zipfile.close()
+            }
+            else
+                zipfile.readEntry();              
+          })
+        }      
+      })
+    } 
+    catch (error)  {  botLog(error, "unzipEng", true)   }    
+  }
+
   function readFinishedEng()
   {
-    if(arrayDataEng.length == size)
+    try
     {
-      var data = "";
-      for(var i = 0; i < size; i++)
+      if(arrayDataEng.length == sets)
       {
-        data += arrayDataEng[i];
-        fs.promises.unlink("./set" + (i + 1) + "Eng.zip")
-          .catch(err => {
-            botLog('Something wrong happened removing the file ' + err)
-          })
-        fs.promises.unlink("./set" + (i + 1) + "-en_us.json")
-          .catch(err => {
-            botLog('Something wrong happened removing the file ' + err)
-          })
-      }    
-      
-      data = data.split('][').join(',');
-      fs.writeFile('./allSetsEng.json', data, () => {
-        botLog("Terminado proceso de update en inglés")
-        allCardsInfoEng = JSON.parse(fs.readFileSync('./allSetsEng.json'));        
-       } );
+        var data = "";
+        for(var i = 0; i < sets; i++)
+        {
+          data += arrayDataEng[i];
+          fs.promises.unlink("./set" + (i + 1) + "Eng.zip").catch(error => {
+              botLog(error, "readFinishedEng", true)
+            })
+          fs.promises.unlink("./set" + (i + 1) + "-en_us.json").catch(error => {
+             botLog(error, "readFinishedEng", true)
+            })
+        }    
+        
+        data = data.split('][').join(',');
+        fs.writeFile('./allSetsEng.json', data, () => { 
+            botLog("Terminado proceso de update en inglés")
+            allCardsInfoEng = JSON.parse(fs.readFileSync('./allSetsEng.json'));
+        } );
+      }
     }
+    catch (error)  {  botLog(error, "readFinishedEng", true)   }    
   }
+  
+
+
 
   return Database
 }
-

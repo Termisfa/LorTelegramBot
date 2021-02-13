@@ -1,4 +1,4 @@
-const Database = require('../Database')
+const Database = require('../Database')("")
 
 module.exports = class CardInDeck {
   constructor (cardCode, count) {
