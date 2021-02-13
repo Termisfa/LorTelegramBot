@@ -163,15 +163,11 @@ bot.on('inline_query', msg => {
           photo_width: 48
           
         }
-        listInlineQueryToSend.push(inlineQueryResultPhoto).catch((error) => {
-          botLog(error.response.body.description, "Inline", true)
-       })
+        listInlineQueryToSend.push(inlineQueryResultPhoto)
         if(i == 49)
           break;
       };
-      bot.answerInlineQuery(msg.id, listInlineQueryToSend).catch((error) => {
-        botLog(error.response.body.description, "Inline", true)
-     })
+      bot.answerInlineQuery(msg.id, listInlineQueryToSend)
     }
     else
     {           
@@ -183,9 +179,7 @@ bot.on('inline_query', msg => {
           description: "No se ha encontrado ninguna carta ni deck",
           message_text: "No se ha encontrado ninguna carta ni deck"
         }
-      ]).catch((error) => {
-        botLog(error.response.body.description, "Inline", true)
-     })
+      ]);
     }
   }
 
