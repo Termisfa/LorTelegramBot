@@ -10,6 +10,12 @@ const bot = new TelegramBot(token, {polling: true});
 
 const chatIdLogs = -333076382; //Id of the group LogBots
 
+try
+ {
+  bot.sendMessage(chatIdLogs, "Bot iniciado")
+ }
+ catch { botLog(error.response.body.description, "Inicio", true) }
+
 
 function botLog(msg, method, error = false)
  {
@@ -470,3 +476,27 @@ function checkAdmin(msg)
     return false 
 }
 
+process.stdin.resume();//so the program will not close instantly
+
+async function exitHandler(options, exitCode) {
+  
+  await bot.sendMessage(chatIdLogs, "EL BOT HA DEJADO DE FUNCIONAR. \nSino se inicia solo de nuevo, reiniciar a mano")
+
+
+    if (options.cleanup) console.log('clean');
+    if (exitCode || exitCode === 0) console.log(exitCode);
+    if (options.exit) process.exit();
+}
+
+//do something when app is closing
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+
+//catches ctrl+c event
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+
+// catches "kill pid" (for example: nodemon restart)
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
+
+//catches uncaught exceptions
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
