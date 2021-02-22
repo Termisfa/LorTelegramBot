@@ -10,11 +10,10 @@ const bot = new TelegramBot(token, {polling: true});
 
 const chatIdLogs = -333076382; //Id of the group LogBots
 
-try
- {
-  bot.sendMessage(chatIdLogs, "Bot iniciado")
- }
- catch { botLog(error.response.body.description, "Inicio", true) }
+
+  bot.sendMessage(chatIdLogs, "Bot iniciado").catch((error) => {
+    botLog(error.response.body.description, "Inicio", true)
+ })
 
 
 function botLog(msg, method, error = false)
