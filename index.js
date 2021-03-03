@@ -115,6 +115,19 @@ bot.onText(/^\!checkauto$/i, (msg, match) => {
    })
 });
 
+//Comando para obtener el json actual
+bot.onText(/^\!getjson$/i, (msg, match) => {
+  if(checkAdmin(msg))
+  {
+    bot.sendDocument(msg.chat.id, './allSetsEsp.json').catch((error) => {
+      botLog(error.response.body.description, "GetJson", true)
+   })
+   bot.sendDocument(msg.chat.id, './allSetsEng.json').catch((error) => {
+    botLog(error.response.body.description, "GetJson", true)
+ })
+  }
+});
+
 //Comando para actualizar la base de datos
 bot.onText(/^\!update$/i, (msg, match) => {
   if(checkAdmin(msg))

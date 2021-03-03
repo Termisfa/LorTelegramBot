@@ -12,7 +12,7 @@ module.exports = function(botLog){
   var allCardsInfoEng = require('./allSetsEng.json')
 
   var lastModifiedZip = new Date()
-  var sets = 3 //Cantidad de sets actuales
+  var sets = 4 //Cantidad de sets actuales
 
 
 

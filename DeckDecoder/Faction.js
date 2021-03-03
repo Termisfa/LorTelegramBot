@@ -37,6 +37,7 @@ Faction.FACTIONS = {
   PZ: 4,
   SI: 5,
   BW: 6,
+  SH: 7,
   MT: 9
 }
 

@@ -9,6 +9,7 @@ module.exports = class ColorRegion {
       this.bilgewater = '180, 86, 58'
       this.demacia = '191, 176, 131'
       this.jonia = '207, 130, 155'
+      this.shurima = '189, 158, 89'
     }
   
     static from () {
@@ -27,6 +28,7 @@ module.exports = class ColorRegion {
             case 'BW': return this.bilgewater
             case 'DE': return this.demacia
             case 'IO': return this.jonia
+            case 'SH': return this.shurima
         }
     }
   }
