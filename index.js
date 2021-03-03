@@ -43,6 +43,7 @@ const nodeHtmlToImage = require('node-html-to-image')
 
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", (error) => {
+  //console.log(error)
   botLog(error, "PollingError", true)
 });
 

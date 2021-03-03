@@ -86,7 +86,7 @@ module.exports = function(botLog){
               {
                   let bool = false
                   infoCardsProv.forEach(element => {
-                      if(card.cardCode == element.cardCode)
+                      if(element != null && card.cardCode == element.cardCode)
                           bool = true
                   });
                   if(!bool)
