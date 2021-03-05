@@ -20,7 +20,7 @@ class DeckEncoder {
     const version = firstByte & 0xF
 
     if (version > DeckEncoder.MAX_KNOWN_VERSION) {
-      console.log('The provided code requires a higher version of this library; please update.')
+      //console.log('The provided code requires a higher version of this library; please update.')
       return msgError
     }
 

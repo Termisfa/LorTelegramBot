@@ -1,0 +1,9 @@
+
+MAILTO=""
+
+
+@reboot docker start bot
+
+@daily sh /motion/removeOldFiles.sh
+
+0 * * * * sh /home/pi/Checker/checkBot.sh `date "+\%H"`

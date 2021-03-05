@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -11,22 +13,29 @@ const bot = new TelegramBot(token, {polling: true});
 const chatIdLogs = -333076382; //Id of the group LogBots
 
 
-  bot.sendMessage(chatIdLogs, "Bot iniciado").catch((error) => {
-    botLog(error.response.body.description, "Inicio", true)
- })
 
 
-function botLog(msg, method, error = false)
+function botLog(telegramMsg, logMsg, method, error = false)
  {
+   console.log('------------------------------------------------------')
+   var message
     if(!error)
-      bot.sendMessage(chatIdLogs, msg + "\n").catch((error) => {
-        console.log(error)
-     })
+      message = telegramMsg + "\n"
     else
-      bot.sendMessage(chatIdLogs, "ERROR EN " + method + ":\n" + msg +"\n").catch((error) => {
-        console.log(error)
-     })
+      message = "ERROR EN " + method + ":\n" + telegramMsg +"\n"
+
+    console.log(new Date() + "\n")
+    console.log(message)
+    if(error)
+      console.log(logMsg)
+    
+    bot.sendMessage(chatIdLogs, message).catch((error) => {
+      console.log(error)
+    })
  }
+
+botLog("Bot iniciado", '', 'Inicio')
+
 
 var Database = require('./Database')(botLog)
 var DeckImage = require('./DeckImage')
@@ -44,15 +53,103 @@ const nodeHtmlToImage = require('node-html-to-image')
 //Listener para que enseñe errores de sintaxis
 bot.on("polling_error", (error) => {
   //console.log(error)
-  botLog(error, "PollingError", true)
+  botLog(error, error, "PollingError", true)
 });
 
+fs.copyFileSync('./checkBot.sh', './Checker/checkBot.sh') //Se copia y cambia el nombre para que aparezca fuera de docker
 
 
+/*
 //Para hacer tests
 bot.onText(/^\!t (.+)/i, (msg, match) => {
   if(checkAdmin(msg))
     Database.checkIfUpdated()
+});
+*/
+
+const schedule = require('node-schedule');
+
+createFile()
+schedule.scheduleJob('55 * * * *', () => createFile()); //Cada hora al minuto 55
+
+function createFile()
+{
+  let ahora = new Date()
+  let path = './Checker/'
+
+  fs.closeSync(fs.openSync(path + ahora.getHours(), 'w'))
+
+  ahora.setHours(ahora.getHours() - 1)
+
+  path += ahora.getHours();
+
+  if(fs.existsSync(path))
+    fs.unlinkSync(path) //Borrar el archivo de la hora anterior si existe  
+}
+
+
+var timeInterval = '0 18 * * 0' //Cada domingo a las 18.00
+var interval = schedule.scheduleJob(timeInterval, () => Database.checkIfUpdated()); 
+
+//Comando para activar o desactivar las actualizaciones automáticas
+bot.onText(/^\!auto$/i, (msg, match) => {
+  if(checkAdmin(msg))
+  {
+    var flag;
+    if(interval.nextInvocation() != null)
+    {
+      interval.cancel();
+      flag = false;
+    }
+    else
+    {
+      interval = schedule.scheduleJob(timeInterval, () => Database.checkIfUpdated()); 
+      flag = true;
+    }
+    
+    bot.sendMessage(msg.chat.id, "Ahora las actualizaciones automáticas están " + (flag ? "activadas" : "desactivadas")).catch((error) => {
+      botLog(error.response.body.description, error, "auto", true)
+   })
+  }
+});
+
+//Comando para mirar si están activadas las actualizaciones automáticas
+bot.onText(/^\!checkauto$/i, (msg, match) => {
+  if(checkAdmin(msg))
+    {
+      var message;
+      if(interval.nextInvocation() != null)
+        message = "La siguiente actualización está programada para: " + interval.nextInvocation();
+      else
+        message =  "Las actualizaciones automáticas están desactivadas";
+
+      bot.sendMessage(msg.chat.id, message + "\nRegla actual de cron: " + timeInterval).catch((error) => {
+        botLog(error.response.body.description, error, "checkauto", true)
+      })
+    }    
+});
+
+//Comando para cambiar la cadencia de las actualizaciones automáticas
+bot.onText(/^\!changeauto (.+)/i, (msg, match) => {
+  if(checkAdmin(msg))
+    {
+      var intervalTest = schedule.scheduleJob(match[1], () => Database.checkIfUpdated()); 
+      if(intervalTest == null)
+        bot.sendMessage(msg.chat.id, "El formato de cron es incorrecto: " + match[1] + ".\nNo se ha realizado ningún cambio").catch((error) => {
+          botLog(error.response.body.description, error, "changeauto", true)
+        })
+      else
+      {
+        intervalTest.cancel()
+        interval.cancel()
+        timeInterval = match[1]
+        interval = schedule.scheduleJob(timeInterval, () => Database.checkIfUpdated());    
+        
+        bot.sendMessage(msg.chat.id, "Cambio realizado. La siguiente actualización será: " + interval.nextInvocation()).catch((error) => {
+          botLog(error.response.body.description, error, "changeauto", true)
+        })
+      }      
+    }    
 });
 
 
@@ -64,7 +161,7 @@ bot.onText(/^\/cafe/i, (msg) => {
   var aux = "Te gusta este bot? Me puedes ayudar donando una pequeña cantidad de dinero por Paypal, "
   aux += "o simplemente compartirlo en otros grupos y redes sociales. Muchas gracias!! paypal.me/Termisfa"
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'}).catch((error) => {
-    botLog(error.response.body.description, "Cafe", true)
+    botLog(error.response.body.description, error, "Cafe", true)
  })
 });
 
@@ -78,7 +175,7 @@ bot.onText(/^\/info/i, (msg) => {
   aux += "*Modo inline:* \n"
   aux += "En cualquier chat (sin necesidad de que el bot esté dentro) usa @LorTermisBot seguido del nombre de una carta, o de el código de un deck. Después de esperar 2 o 3 segundos como mucho, aparecerá la imagen o imágenes como resultados. Selecciona el deseado, y el bot responderá en ese chat con la imagen."
   bot.sendMessage(chatId, aux, {parse_mode: 'Markdown'}).catch((error) => {
-    botLog(error.response.body.description, "Info", true)
+    botLog(error.response.body.description, error, "Info", true)
  })
 });
 
@@ -89,43 +186,27 @@ bot.on("message", (msg) => {
 });
 */
 
-var intervalActivated = true
-var interval = setInterval(() => Database.checkIfUpdated(), 86400000) //Cada día 86400000
-
-//Comando para activar o desactivar las actualizaciones automáticas
-bot.onText(/^\!auto$/i, (msg, match) => {
-  if(checkAdmin(msg))
-  {
-    if(intervalActivated)
-      clearInterval(interval)
-    else
-      interval = setInterval(() => Database.checkIfUpdated(), 86400000)
-    
-    interval = !interval
-    bot.sendMessage(msg.chat.id, "Ahora las actualizaciones automáticas están " + (interval ? "activadas" : "desactivadas")).catch((error) => {
-      botLog(error.response.body.description, "auto", true)
-   })
-  }
-});
-
-//Comando para mirar si están activadas las actualizaciones automáticas
-bot.onText(/^\!checkauto$/i, (msg, match) => {
-  if(checkAdmin(msg))
-    bot.sendMessage(msg.chat.id, "Las actualizaciones automáticas están " + (interval ? "activadas" : "desactivadas")).catch((error) => {
-      botLog(error.response.body.description, "checkauto", true)
-   })
-});
 
 //Comando para obtener el json actual
 bot.onText(/^\!getjson$/i, (msg, match) => {
   if(checkAdmin(msg))
   {
     bot.sendDocument(msg.chat.id, './allSetsEsp.json').catch((error) => {
-      botLog(error.response.body.description, "GetJson", true)
+      botLog(error.response.body.description, error, "GetJson", true)
    })
    bot.sendDocument(msg.chat.id, './allSetsEng.json').catch((error) => {
-    botLog(error.response.body.description, "GetJson", true)
+    botLog(error.response.body.description, error, "GetJson", true)
  })
+  }
+});
+
+//Comando para obtener el log
+bot.onText(/^\!getlog$/i, (msg, match) => {
+  if(checkAdmin(msg))
+  {
+    bot.sendDocument(msg.chat.id, './Checker/bot.log').catch((error) => {
+      botLog(error.response.body.description, error, "GetLog", true)
+   })
   }
 });
 
@@ -135,7 +216,7 @@ bot.onText(/^\!update$/i, (msg, match) => {
   {
     Database.update()
     bot.sendMessage(msg.chat.id, "Iniciada actualización").catch((error) => {
-      botLog(error.response.body.description, "update", true)
+      botLog(error.response.body.description, error, "update", true)
    })
   }
 });
@@ -149,12 +230,12 @@ bot.onText(/^\!sets (.+)/i, (msg, match) => {
     {
       Database.forceSets(parseInt(text))
       bot.sendMessage(msg.chat.id, "Sets cambiados a " + text).catch((error) => {
-        botLog(error.response.body.description, "sets", true)
+        botLog(error.response.body.description, error, "sets", true)
      })
     }
     else
       bot.sendMessage(msg.chat.ig, "Error, '" + text + "' no es un número válido").catch((error) => {
-        botLog(error.response.body.description, "sets", true)
+        botLog(error.response.body.description, error, "sets", true)
      })
   }
 });
@@ -230,7 +311,7 @@ function isDeckInline(msg)
         .then((img) => {
           //-437983251 es el ID del grupo donde escupe los resultados
           var promise2 = bot.sendPhoto(-437983251, img).catch((error) => {
-            botLog(error.response.body.description, "isDeckInline", true)
+            botLog(error.response.body.description, error, "isDeckInline", true)
           })
           promise2.catch((error) => {
             botLog(error, "isDeckInline", true)
@@ -243,7 +324,7 @@ function isDeckInline(msg)
                 photo_file_id: result.photo[1].file_id
               }
             ]).catch((error) => {
-              botLog(error.response.body.description, "isDeckInline", true)
+              botLog(error.response.body.description, error, "isDeckInline", true)
            })
           })
         })
@@ -284,7 +365,7 @@ function searchDeckCommand(msg, match)
   var deck = DeckEncoder.decode(match[1])
   if(deck == "InvalidDeck" || !deck)
     bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'}).catch((error) => {
-      botLog(error.response.body.description, "searchDeckCommand", true)
+      botLog(error.response.body.description, error, "searchDeckCommand", true)
    })
   else
   {
@@ -308,7 +389,7 @@ function searchDeckCommand(msg, match)
         .then((img) => {
           //console.log(img)
           bot.sendPhoto(chatId, img).catch((error) => {
-            botLog(error.response.body.description, "searchDeckCommand", true)
+            botLog(error.response.body.description, error, "searchDeckCommand", true)
           })
         })
       }) 
@@ -316,7 +397,7 @@ function searchDeckCommand(msg, match)
     catch(error)
     {
       bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'}).catch((error) => {
-        botLog(error.response.body.description, "searchDeckCommand", true)
+        botLog(error.response.body.description, error, "searchDeckCommand", true)
       })
     } 
   }
@@ -329,7 +410,7 @@ function searchDeckCommandVertical(msg, match)
   var deck = DeckEncoder.decode(match[1])
   if(deck == "InvalidDeck" || !deck)
     bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'}).catch((error) => {
-      botLog(error.response.body.description, "searchDeckVertical", true)
+      botLog(error.response.body.description, error, "searchDeckVertical", true)
     })
   else
   {
@@ -351,7 +432,7 @@ function searchDeckCommandVertical(msg, match)
         .then((img) => {
           //console.log(img)
           bot.sendPhoto(chatId, img).catch((error) => {
-            botLog(error.response.body.description, "searchDeckCommandVertical", true)
+            botLog(error.response.body.description, error, "searchDeckCommandVertical", true)
           })
         })
       }) 
@@ -359,7 +440,7 @@ function searchDeckCommandVertical(msg, match)
     catch(error)
     {
       bot.sendMessage(chatId, "`" + match[1] + "` no es un código válido de deck", {parse_mode: 'Markdown'}).catch((error) => {
-        botLog(error.response.body.description, "searchDeckCommandVertical", true)
+        botLog(error.response.body.description, error, "searchDeckCommandVertical", true)
       })
     } 
   }
@@ -411,10 +492,10 @@ bot.onText(/^\/updateCommands$/i, (msg) => {
    
    bot.setMyCommands(opts).then( () => {
        bot.sendMessage(chatId, "Comandos actualizados").catch((error) => {
-        botLog(error.response.body.description, "Actualizar comandos", true)
+        botLog(error.response.body.description, error, "Actualizar comandos", true)
           })
         }).catch((error) => {
-          botLog(error.response.body.description, "Actualizar comandos", true)
+          botLog(error.response.body.description, error, "Actualizar comandos", true)
         })
   //console.log(bot.getMyCommands())
 });
@@ -432,7 +513,7 @@ function mergeImagesAndSend(chatId, cardList)
   .then((img) => { 
     img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
       bot.sendPhoto(chatId, buffer).catch((error) => {
-        botLog(error.response.body.description, "mergeImagesAndSend", true)
+        botLog(error.response.body.description, error, "mergeImagesAndSend", true)
       })
     });
   })
@@ -447,7 +528,7 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
     if(infoCardsProv.length == 0)
     {
       bot.sendMessage(chatId, "No se ha encontrado ninguna carta que incluya en el nombre '" + msgReceived + "'").catch((error) => {
-        botLog(error.response.body.description, "checkCorrectName", true)
+        botLog(error.response.body.description, error, "checkCorrectName", true)
      })
       return false
     }
@@ -467,7 +548,7 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
         aux.substring(0, aux.length - 2)
       }
       bot.sendMessage(chatId, aux).catch((error) => {
-        botLog(error.response.body.description, "checkCorrectName", true)
+        botLog(error.response.body.description, error, "checkCorrectName", true)
      })
       return false
     }
@@ -493,12 +574,13 @@ process.stdin.resume();//so the program will not close instantly
 
 async function exitHandler(options, exitCode) {
   
-  await bot.sendMessage(chatIdLogs, "EL BOT HA DEJADO DE FUNCIONAR. \nSino se inicia solo de nuevo, reiniciar a mano")
+  await botLog("EL BOT HA DEJADO DE FUNCIONAR. \nSino se inicia solo de nuevo, reiniciar a mano", 'Exit') 
 
 
     if (options.cleanup) console.log('clean');
     if (exitCode || exitCode === 0) console.log(exitCode);
     if (options.exit) process.exit();
+    
 }
 
 //do something when app is closing

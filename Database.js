@@ -149,14 +149,14 @@ module.exports = function(botLog){
           request
           .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
           .on('error', function(error) {
-            botLog(error, "checkIfUpdated", true)
+            botlog(error, error, "checkIfUpdated", true)
           })
           .pipe(fs.createWriteStream(downloadSave))
           .on('finish', function() 
           {
             yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
               if (error) 
-                botLog(error, "checkIfUpdated", true)
+                botlog(error, error, "checkIfUpdated", true)
               else
               {
                 zipfile.readEntry();
@@ -173,12 +173,12 @@ module.exports = function(botLog){
                 })
               }  
               fs.promises.unlink(downloadSave).catch(error => {
-                botLog(error, "checkIfUpdated", true)
+                botlog(error, error, "checkIfUpdated", true)
               })            
             })
           })
         }
-        catch (error)  {  botLog(error, "checkIfUpdated", true)   }   
+        catch (error)  {  botlog(error, error, "checkIfUpdated", true)   }   
       }
   }
   
@@ -210,14 +210,14 @@ module.exports = function(botLog){
       request
       .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
       .on('error', function(error) {
-        botLog(error, "downloadEsp", true)
+        botlog(error, error, "downloadEsp", true)
       })
       .pipe(fs.createWriteStream(downloadSave))
       .on('finish', function() {
         unzipEsp(jsonSave, downloadSave, number)
       })
     }
-    catch (error)  {  botLog(error, "unzipEsp", true)   }   
+    catch (error)  {  botlog(error, error, "unzipEsp", true)   }   
     
   }
 
@@ -228,7 +228,7 @@ module.exports = function(botLog){
       yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
         if (error) 
           fs.promises.unlink(downloadSave).catch(error => {
-            botLog(error, "unzipEsp", true)
+            botlog(error, error, "unzipEsp", true)
           })        
         else
         {
@@ -245,7 +245,7 @@ module.exports = function(botLog){
           {
             zipfile.openReadStream(entry, function(error, readStream) {
                 if (error) 
-                  botLog(error, "unzipEsp", true)
+                  botlog(error, error, "unzipEsp", true)
                 else
                 {                      
                   readStream.pipe(fs.createWriteStream(jsonSave));
@@ -253,7 +253,7 @@ module.exports = function(botLog){
                     //Ya está creado el json, aquí lo leemos y guardamos en el array
                     fs.readFile(jsonSave, function(error, data){
                       if(error)
-                        botLog(error, "unzipEsp", true)
+                        botlog(error, error, "unzipEsp", true)
                       else
                       {
                         arrayDataEsp.push(data);
@@ -271,7 +271,7 @@ module.exports = function(botLog){
         }      
       })
     } 
-    catch (error)  {  botLog(error, "unzipEsp", true)   }    
+    catch (error)  {  botlog(error, error, "unzipEsp", true)   }    
   }
 
   
@@ -286,10 +286,10 @@ module.exports = function(botLog){
         {
           data += arrayDataEsp[i];
           fs.promises.unlink("./set" + (i + 1) + "Esp.zip").catch(error => {
-              botLog(error, "readFinishedEsp", true)
+              botlog(error, error, "readFinishedEsp", true)
             })
           fs.promises.unlink("./set" + (i + 1) + "-es_es.json").catch(error => {
-             botLog(error, "readFinishedEsp", true)
+             botlog(error, error, "readFinishedEsp", true)
             })
         }
         
@@ -300,7 +300,7 @@ module.exports = function(botLog){
         } );
       }
     }
-    catch (error)  {  botLog(error, "readFinishedEsp", true)   }    
+    catch (error)  {  botlog(error, error, "readFinishedEsp", true)   }    
   }
   
   
@@ -316,14 +316,14 @@ module.exports = function(botLog){
       request
       .get('https://dd.b.pvp.net/latest/set' + number + '-lite-en_us.zip')
       .on('error', function(error) {
-        botLog(error, "downloadEng", true) 
+        botlog(error, error, "downloadEng", true) 
       })
       .pipe(fs.createWriteStream(downloadSave))
       .on('finish', function() {
         unzipEng(jsonSave, downloadSave)     
       })
     }
-    catch (error)  {  botLog(error, "downloadEng", true)   }    
+    catch (error)  {  botlog(error, error, "downloadEng", true)   }    
   }
 
   function unzipEng(jsonSave, downloadSave)
@@ -334,7 +334,7 @@ module.exports = function(botLog){
         if (error) 
         {
           fs.promises.unlink(downloadSave).catch(error => {
-            botLog(error, "unzipEng", true)
+            botlog(error, error, "unzipEng", true)
           }) 
         }                 
         else
@@ -345,7 +345,7 @@ module.exports = function(botLog){
             {
               zipfile.openReadStream(entry, function(error, readStream) {
                   if (error) 
-                    botLog(error, "unzipEng", true)
+                    botlog(error, error, "unzipEng", true)
                   else
                   {                      
                     readStream.pipe(fs.createWriteStream(jsonSave));
@@ -353,7 +353,7 @@ module.exports = function(botLog){
                       //Ya está creado el json, aquí lo leemos y guardamos en el array
                       fs.readFile(jsonSave, function(error, data){
                         if(error)
-                          botLog(error, "unzipEng", true)
+                          botlog(error, error, "unzipEng", true)
                         else
                         {
                           arrayDataEng.push(data);
@@ -371,7 +371,7 @@ module.exports = function(botLog){
         }      
       })
     } 
-    catch (error)  {  botLog(error, "unzipEng", true)   }    
+    catch (error)  {  botlog(error, error, "unzipEng", true)   }    
   }
 
   function readFinishedEng()
@@ -385,10 +385,10 @@ module.exports = function(botLog){
         {
           data += arrayDataEng[i];
           fs.promises.unlink("./set" + (i + 1) + "Eng.zip").catch(error => {
-              botLog(error, "readFinishedEng", true)
+              botlog(error, error, "readFinishedEng", true)
             })
           fs.promises.unlink("./set" + (i + 1) + "-en_us.json").catch(error => {
-             botLog(error, "readFinishedEng", true)
+             botlog(error, error, "readFinishedEng", true)
             })
         }    
         
@@ -399,7 +399,7 @@ module.exports = function(botLog){
         } );
       }
     }
-    catch (error)  {  botLog(error, "readFinishedEng", true)   }    
+    catch (error)  {  botlog(error, error, "readFinishedEng", true)   }    
   }
   
 

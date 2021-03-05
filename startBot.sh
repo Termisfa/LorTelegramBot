@@ -1,0 +1,1 @@
+node index.js >./Checker/bot.log 2>&1
