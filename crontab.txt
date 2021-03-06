@@ -6,4 +6,4 @@ MAILTO=""
 
 @daily sh /motion/removeOldFiles.sh
 
-0 * * * * sh /home/pi/Checker/checkBot.sh `date "+\%H"`
+0 * * * * sh /home/pi/checker/checkBot.sh `date "+\%H"`

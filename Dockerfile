@@ -26,10 +26,10 @@ RUN npm install
 COPY --chown=chrome . ./
 #COPY  ./Checker/checkBot.sh ./Checker/checkBot.sh
 
-VOLUME /usr/src/app/Checker
+VOLUME /usr/src/app/checker
 
 
 CMD ["./startBot.sh"]
 	
-	
-#docker run -d --name test -v /home/pi/Checker:/usr/src/app/Checker termisfa/bot
+#docker buildx build --platform linux/amd64,linux/arm/v7 -t termisfa/bot --push .
+#docker run -d --name bot -v /home/pi/checker:/usr/src/app/checker termisfa/bot

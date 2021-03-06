@@ -11,7 +11,7 @@ fi
 
 FILE=/home/pi/$NUMERO
 if test ! -f "$FILE"; then
-    docker stop test;
-    docker start test;
+    docker stop bot;
+    docker start bot;
 fi
 
