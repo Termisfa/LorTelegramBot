@@ -56,7 +56,7 @@ bot.on("polling_error", (error) => {
   botLog(error, error, "PollingError", true)
 });
 
-fs.copyFileSync('./checkBot.sh', './Checker/checkBot.sh') //Se copia y cambia el nombre para que aparezca fuera de docker
+fs.copyFileSync('./checkBot.sh', './checker/checkBot.sh') //Se copia y cambia el nombre para que aparezca fuera de docker
 
 
 /*
@@ -75,7 +75,7 @@ schedule.scheduleJob('55 * * * *', () => createFile()); //Cada hora al minuto 55
 function createFile()
 {
   let ahora = new Date()
-  let path = './Checker/'
+  let path = './checker/'
 
   fs.closeSync(fs.openSync(path + ahora.getHours(), 'w'))
 
@@ -200,11 +200,29 @@ bot.onText(/^\!getjson$/i, (msg, match) => {
   }
 });
 
-//Comando para obtener el log
+//Comando para obtener el log más reciente
 bot.onText(/^\!getlog$/i, (msg, match) => {
   if(checkAdmin(msg))
   {
-    bot.sendDocument(msg.chat.id, './Checker/bot.log').catch((error) => {
+    var path = './checker'
+    var directory = fs.readdirSync(path)
+    var recentDate = new Date(0)
+    var pathRecentLog = ""
+
+    directory.forEach(function (file) {
+        if(file.includes(".log"))
+        {
+            var completePath = path + "/" + file
+            var actualDate = fs.statSync(completePath).mtime
+            if(actualDate > recentDate)
+            {
+                recentDate = actualDate
+                pathRecentLog = completePath
+            }
+        }    
+    })
+
+    bot.sendDocument(msg.chat.id, pathRecentLog).catch((error) => {
       botLog(error.response.body.description, error, "GetLog", true)
    })
   }
