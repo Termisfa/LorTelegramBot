@@ -1,8 +1,9 @@
 
 MAILTO=""
 
-
+@reboot source /.bash_aliases
 @reboot docker start bot
+@reboot sudo service motion stop
 
 @daily sh /motion/removeOldFiles.sh
 
