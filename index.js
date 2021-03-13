@@ -28,10 +28,10 @@ function botLog(telegramMsg, logMsg, method, error = false)
     console.log(message)
     if(error)
       console.log(logMsg)
-    /*
+    
     bot.sendMessage(chatIdLogs, message).catch((error) => {
       console.log(error)
-    })*/
+    })
  }
 
 botLog("Bot iniciado", '', 'Inicio')
@@ -499,52 +499,6 @@ function searchCardCommand(msg, match)
   }  
 }
 
-
-//Actualizar comandos
-bot.onText(/^\/updateCommands$/i, (msg) => {  
-  const chatId = msg.chat.id;
-  const opts = [
-    {command: 'info', description: 'Info sobre comandos'},
-    {command: 'cafe', description: 'Cómprame un café'}
-   ];
-   
-   bot.setMyCommands(opts).then( () => {
-       bot.sendMessage(chatId, "Comandos actualizados").catch((error) => {
-        botLog(error.response.body.description, error, "Actualizar comandos", true)
-          })
-        }).catch((error) => {
-          botLog(error.response.body.description, error, "Actualizar comandos", true)
-        })
-  //console.log(bot.getMyCommands())
-});
-
-//Junta imagenes en una desde una lista de cartas y la manda
-function mergeImagesAndSend(chatId, cardList)
-{
-  try {
-    let cardListImages = [] 
-
-    cardList.forEach(element => {
-      cardListImages.push(element.imageUrl)
-    });   
-  
-    mergeImg(cardListImages).catch((error) => {
-      botLog(error, "mergeImagesAndSend", true)
-    })
-    .then((img) => { 
-      img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-        bot.sendPhoto(chatId, buffer).catch((error) => {
-          botLog(error.response.body.description, error, "mergeImagesAndSend", true)
-        })
-      });
-    })
-  } catch (error) {
-    botLog(error, "mergeImagesAndSend", true)
-  }  
-}
-
-
-
 function checkCorrectName(infoCardsProv, msgReceived, chatId)
 {
   try { 
@@ -583,6 +537,50 @@ function checkCorrectName(infoCardsProv, msgReceived, chatId)
   }
   return false
 }
+
+//Junta imagenes en una desde una lista de cartas y la manda
+function mergeImagesAndSend(chatId, cardList)
+{
+  try {
+    let cardListImages = [] 
+
+    cardList.forEach(element => {
+      cardListImages.push(element.imageUrl)
+    });   
+  
+    mergeImg(cardListImages).catch((error) => {
+      bot.sendMessage(chatId, "Ha habido un problema con el servidor de RIOT. Prueba a buscar la carta con el modo inline (@LorTermisBot seguido del nombre de la carta)")
+      botLog(error, "mergeImagesAndSend", true)
+    })
+    .then((img) => { 
+      img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+        bot.sendPhoto(chatId, buffer).catch((error) => {
+          botLog(error.response.body.description, error, "mergeImagesAndSend", true)
+        })
+      });
+    })
+  } catch (error) {
+    botLog(error, "mergeImagesAndSend", true)
+  }  
+}
+
+//Actualizar comandos
+bot.onText(/^\/updateCommands$/i, (msg) => {  
+  const chatId = msg.chat.id;
+  const opts = [
+    {command: 'info', description: 'Info sobre comandos'},
+    {command: 'cafe', description: 'Cómprame un café'}
+   ];
+   
+   bot.setMyCommands(opts).then( () => {
+       bot.sendMessage(chatId, "Comandos actualizados").catch((error) => {
+        botLog(error.response.body.description, error, "Actualizar comandos", true)
+          })
+        }).catch((error) => {
+          botLog(error.response.body.description, error, "Actualizar comandos", true)
+        })
+  //console.log(bot.getMyCommands())
+});
 
 //Devuelve true si el usuario tiene permisos de admin
 function checkAdmin(msg)
