@@ -9,7 +9,7 @@ fi
 
 
 
-FILE=/home/pi/$NUMERO
+FILE=/home/pi/checker/$NUMERO
 if test ! -f "$FILE"; then
     docker stop bot;
     docker start bot;

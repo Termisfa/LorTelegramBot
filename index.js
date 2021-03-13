@@ -28,10 +28,10 @@ function botLog(telegramMsg, logMsg, method, error = false)
     console.log(message)
     if(error)
       console.log(logMsg)
-    
+    /*
     bot.sendMessage(chatIdLogs, message).catch((error) => {
       console.log(error)
-    })
+    })*/
  }
 
 botLog("Bot iniciado", '', 'Inicio')
@@ -521,20 +521,26 @@ bot.onText(/^\/updateCommands$/i, (msg) => {
 //Junta imagenes en una desde una lista de cartas y la manda
 function mergeImagesAndSend(chatId, cardList)
 {
-  let cardListImages = [] 
+  try {
+    let cardListImages = [] 
 
-  cardList.forEach(element => {
-    cardListImages.push(element.imageUrl)
-  });   
-
-  mergeImg(cardListImages)
-  .then((img) => { 
-    img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
-      bot.sendPhoto(chatId, buffer).catch((error) => {
-        botLog(error.response.body.description, error, "mergeImagesAndSend", true)
-      })
-    });
-  })
+    cardList.forEach(element => {
+      cardListImages.push(element.imageUrl)
+    });   
+  
+    mergeImg(cardListImages).catch((error) => {
+      botLog(error, "mergeImagesAndSend", true)
+    })
+    .then((img) => { 
+      img.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+        bot.sendPhoto(chatId, buffer).catch((error) => {
+          botLog(error.response.body.description, error, "mergeImagesAndSend", true)
+        })
+      });
+    })
+  } catch (error) {
+    botLog(error, "mergeImagesAndSend", true)
+  }  
 }
 
 
