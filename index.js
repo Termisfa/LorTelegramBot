@@ -32,6 +32,7 @@ function botLog(telegramMsg, logMsg, method, error = false)
     bot.sendMessage(chatIdLogs, message).catch((error) => {
       console.log(error)
     })
+   console.log('------------------------------------------------------')
  }
 
 botLog("Bot iniciado", '', 'Inicio')
@@ -187,16 +188,18 @@ bot.on("message", (msg) => {
 */
 
 
-//Comando para obtener el json actual
+//Comando para obtener los json actuales
 bot.onText(/^\!getjson$/i, (msg, match) => {
   if(checkAdmin(msg))
   {
-    bot.sendDocument(msg.chat.id, './allSetsEsp.json').catch((error) => {
-      botLog(error.response.body.description, error, "GetJson", true)
-   })
-   bot.sendDocument(msg.chat.id, './allSetsEng.json').catch((error) => {
-    botLog(error.response.body.description, error, "GetJson", true)
- })
+    var languages = Database.getLanguages()
+
+    for(var i = 0; i < languages.length; i++)
+    {
+      bot.sendDocument(msg.chat.id, './allSets-' + languages[i] + '.json').catch((error) => {
+        botLog(error.response.body.description, error, "GetJson", true)
+      })
+    }
   }
 });
 

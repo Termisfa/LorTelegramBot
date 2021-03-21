@@ -7,39 +7,44 @@ module.exports = function(botLog){
   const fs = require('fs');
   
   const CardInfo = require('./CardInfo')
-  
-  var allCardsInfo = require('./allSetsEsp.json')
-  var allCardsInfoEng = require('./allSetsEng.json')
 
   var lastModifiedZip = new Date()
   var sets = 4 //Cantidad de sets actuales
 
+  const languages = ['es_es', 'en_us', 'es_mx']
+  var arrayDownloadFinished
 
-
-  var arrayDataEsp
-  var arrayDataEng
-  
+  var allCardsArray = new Array()
+  for(var i = 0; i < languages.length; i++)
+    allCardsArray.push(require('./allSets-' + languages[i] + '.json'))
   
   
   
   class Database
   {
+      //Obtiene los idiomas
+      static getLanguages()
+      {
+        return languages
+      }
+
       //Fuerza los sets actuales al número de entrada
       static forceSets(number)
       {
         sets = number
       }
 
-      //Actualiza los datos desde los json
+      //Inicia el proceso de actualización, comprobando si hay un set nuevo
       static update(number = (sets + 1)) 
       {
-        arrayDataEsp = new Array()
-        for(var i = 0; i < number; i++)
-            downloadEsp(i + 1);
-
-        arrayDataEng = new Array()
-        for(var i = 0; i < number; i++)
-            downloadEng(i + 1);          
+        arrayDownloadFinished = new Array()
+        for(var i = 0; i < languages.length; i++)
+        {
+          arrayDownloadFinished[i] = new Array()
+          for(var j = 0; j < number; j++)
+            download(languages[i], i, j + 1)
+        }
+       
       }
 
       //Devuelve una lista de cartas coleccionables con todas las que contengan un string
@@ -49,12 +54,14 @@ module.exports = function(botLog){
           cardName = cardName.toLowerCase()
           cardName = removeAccents(cardName)
           //Busca las cartas en español
-          allCardsInfo.forEach(card => {
+          allCardsArray[0].forEach(card => {
               if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
                   infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
           });
-          //Busca las cartas en inglés, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
-          allCardsInfoEng.forEach(card => {
+          //Busca las cartas en los demás idiomas, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
+          for(var i = 1; i < languages.length; i++)
+          {
+            allCardsArray[i].forEach(card => {
               if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
               {
                   let bool = false
@@ -65,7 +72,9 @@ module.exports = function(botLog){
                   if(!bool)
                       infoCardsProv.push(this.searchCardById(card.cardCode))
               }   
-          });
+            });
+          }
+          
           return infoCardsProv
       }
 
@@ -76,12 +85,14 @@ module.exports = function(botLog){
           cardName = cardName.toLowerCase()
           cardName = removeAccents(cardName)
           //Busca las cartas en español
-          allCardsInfo.forEach(card => {
+          allCardsArray[0].forEach(card => {
               if(removeAccents(card.name.toLowerCase()).includes(cardName))
                   infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
           });
-          //Busca las cartas en inglés, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
-          allCardsInfoEng.forEach(card => {
+          //Busca las cartas en los demás idiomas, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
+          for(var i = 1; i < languages.length; i++)
+          {
+            allCardsArray[i].forEach(card => {
               if(removeAccents(card.name.toLowerCase()).includes(cardName))
               {
                   let bool = false
@@ -92,7 +103,9 @@ module.exports = function(botLog){
                   if(!bool)
                       infoCardsProv.push(this.searchCardById(card.cardCode))
               }   
-          });
+            });
+          }
+
           return infoCardsProv
       }
 
@@ -100,10 +113,10 @@ module.exports = function(botLog){
       static searchCardById(cardId)
       {
           //Con for, porque foreach no admite breaks ni returns
-          for(var i = 0; i < allCardsInfo.length; i++)
+          for(var i = 0; i < allCardsArray[0].length; i++)
           {
-              if(allCardsInfo[i].cardCode === cardId)
-                  return CardInfo.from(allCardsInfo[i].cardCode, allCardsInfo[i].name, allCardsInfo[i].assets[0].gameAbsolutePath, allCardsInfo[i].associatedCardRefs, allCardsInfo[i].cost, getTypeOfCard(allCardsInfo[i]))
+              if(allCardsArray[0][i].cardCode === cardId)
+                  return CardInfo.from(allCardsArray[0][i].cardCode, allCardsArray[0][i].name, allCardsArray[0][i].assets[0].gameAbsolutePath, allCardsArray[0][i].associatedCardRefs, allCardsArray[0][i].cost, getTypeOfCard(allCardsArray[0][i]))
           }
       }
       //Busca cartas relacionadas con una y devuelve la lista
@@ -198,54 +211,51 @@ module.exports = function(botLog){
       return text.split('').map( char => accentsList[char] || char).join('').toString();	
   }
   
-  
-  
-  function downloadEsp(number)
+  function download(lang, positionLang, set)
   {
-    try {
-      var downloadSave = "./set" + number + "Esp.zip"
-      var jsonSave = "set" + number + "-es_es.json"
-
+    try
+    {
+      var downloadSave = "./set" + set + lang + ".zip"
+      var jsonSave = "set" + set + "-" + lang + ".json"
 
       request
-      .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
+      .get('https://dd.b.pvp.net/latest/set' + set + '-lite-' + lang + '.zip')
       .on('error', function(error) {
-        botlog(error, error, "downloadEsp", true)
+        botlog(error, error, "download", true)
       })
       .pipe(fs.createWriteStream(downloadSave))
       .on('finish', function() {
-        unzipEsp(jsonSave, downloadSave, number)
+        unzip(jsonSave, downloadSave, set, lang, positionLang)
       })
     }
-    catch (error)  {  botlog(error, error, "unzipEsp", true)   }   
-    
+    catch (error)  {  botlog(error, error, "download", true)   }
   }
 
-  function unzipEsp(jsonSave, downloadSave, number)
+  function unzip(jsonSave, downloadSave, set, lang, positionLang)
   {
     try 
     {
       yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
         if (error) 
           fs.promises.unlink(downloadSave).catch(error => {
-            botlog(error, error, "unzipEsp", true)
+            botlog(error, error, "unzip", true)
           })        
         else
         {
           //En caso de que se descargue un nuevo set por primera vez
-          if(sets < number)
+          if(sets < set)
           {
-            botLog("Se ha aumentado el número de sets a " + number)
-            sets = number
+            botLog("Se ha aumentado el número de sets a " + set)
+            sets = set
           }
 
           zipfile.readEntry();
           zipfile.on("entry", function(entry) {        
-          if(entry.fileName == ( "es_es/data/" + jsonSave)) 
+          if(entry.fileName == ( lang + "/data/" + jsonSave)) 
           {
             zipfile.openReadStream(entry, function(error, readStream) {
                 if (error) 
-                  botlog(error, error, "unzipEsp", true)
+                  botlog(error, error, "unzip", true)
                 else
                 {                      
                   readStream.pipe(fs.createWriteStream(jsonSave));
@@ -253,11 +263,11 @@ module.exports = function(botLog){
                     //Ya está creado el json, aquí lo leemos y guardamos en el array
                     fs.readFile(jsonSave, function(error, data){
                       if(error)
-                        botlog(error, error, "unzipEsp", true)
+                        botlog(error, error, "unzip", true)
                       else
                       {
-                        arrayDataEsp.push(data);
-                        readFinishedEsp()
+                        arrayDownloadFinished[positionLang].push(data)
+                        readFinished(lang, positionLang)
                       }                          
                     })
                   })
@@ -271,139 +281,37 @@ module.exports = function(botLog){
         }      
       })
     } 
-    catch (error)  {  botlog(error, error, "unzipEsp", true)   }    
+    catch (error)  {  botlog(error, error, "unzip", true)   } 
   }
 
-  
-  function readFinishedEsp()
+  function readFinished(lang, positionLang)
   {
     try
     {
-      if(arrayDataEsp.length == sets)
+      if(arrayDownloadFinished[positionLang].length == sets)
       {
         var data = "";
         for(var i = 0; i < sets; i++)
         {
-          data += arrayDataEsp[i];
-          fs.promises.unlink("./set" + (i + 1) + "Esp.zip").catch(error => {
-              botlog(error, error, "readFinishedEsp", true)
+          data += arrayDownloadFinished[positionLang][i];
+          fs.promises.unlink("./set" + (i + 1) + lang + ".zip").catch(error => {
+              botlog(error, error, "readFinished", true)
             })
-          fs.promises.unlink("./set" + (i + 1) + "-es_es.json").catch(error => {
-             botlog(error, error, "readFinishedEsp", true)
+          fs.promises.unlink("./set" + (i + 1) + "-" + lang + ".json").catch(error => {
+             botlog(error, error, "readFinished", true)
             })
         }
         
         data = data.split('][').join(',');
-        fs.writeFile('./allSetsEsp.json', data, () => { 
-            botLog("Terminado proceso de update en español")
-            allCardsInfo = JSON.parse(fs.readFileSync('./allSetsEsp.json'));
+        fs.writeFile('./allSets-' +  lang + '.json', data, () => { 
+            botLog("Terminado proceso de update para " + lang)
+            allCardsArray[0] = JSON.parse(fs.readFileSync('./allSets-' +  lang + '.json'));
         } );
       }
     }
-    catch (error)  {  botlog(error, error, "readFinishedEsp", true)   }    
+    catch (error)  {  botlog(error, error, "readFinished", true)   }    
   }
   
   
-  
-  function downloadEng(number)
-  {
-    try
-    {
-      var downloadSave = "./set" + number + "Eng.zip"
-      var jsonSave = "set" + number + "-en_us.json"
-  
-  
-      request
-      .get('https://dd.b.pvp.net/latest/set' + number + '-lite-en_us.zip')
-      .on('error', function(error) {
-        botlog(error, error, "downloadEng", true) 
-      })
-      .pipe(fs.createWriteStream(downloadSave))
-      .on('finish', function() {
-        unzipEng(jsonSave, downloadSave)     
-      })
-    }
-    catch (error)  {  botlog(error, error, "downloadEng", true)   }    
-  }
-
-  function unzipEng(jsonSave, downloadSave)
-  {
-    try 
-    {
-      yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
-        if (error) 
-        {
-          fs.promises.unlink(downloadSave).catch(error => {
-            botlog(error, error, "unzipEng", true)
-          }) 
-        }                 
-        else
-        {
-          zipfile.readEntry();
-          zipfile.on("entry", function(entry) {        
-            if(entry.fileName == ("en_us/data/" + jsonSave))
-            {
-              zipfile.openReadStream(entry, function(error, readStream) {
-                  if (error) 
-                    botlog(error, error, "unzipEng", true)
-                  else
-                  {                      
-                    readStream.pipe(fs.createWriteStream(jsonSave));
-                    readStream.on("end", function() {
-                      //Ya está creado el json, aquí lo leemos y guardamos en el array
-                      fs.readFile(jsonSave, function(error, data){
-                        if(error)
-                          botlog(error, error, "unzipEng", true)
-                        else
-                        {
-                          arrayDataEng.push(data);
-                          readFinishedEng()
-                        }                          
-                      })
-                    })
-                  }                  
-                });
-                zipfile.close()
-            }
-            else
-                zipfile.readEntry();              
-          })
-        }      
-      })
-    } 
-    catch (error)  {  botlog(error, error, "unzipEng", true)   }    
-  }
-
-  function readFinishedEng()
-  {
-    try
-    {
-      if(arrayDataEng.length == sets)
-      {
-        var data = "";
-        for(var i = 0; i < sets; i++)
-        {
-          data += arrayDataEng[i];
-          fs.promises.unlink("./set" + (i + 1) + "Eng.zip").catch(error => {
-              botlog(error, error, "readFinishedEng", true)
-            })
-          fs.promises.unlink("./set" + (i + 1) + "-en_us.json").catch(error => {
-             botlog(error, error, "readFinishedEng", true)
-            })
-        }    
-        
-        data = data.split('][').join(',');
-        fs.writeFile('./allSetsEng.json', data, () => { 
-            botLog("Terminado proceso de update en inglés")
-            allCardsInfoEng = JSON.parse(fs.readFileSync('./allSetsEng.json'));
-        } );
-      }
-    }
-    catch (error)  {  botlog(error, error, "readFinishedEng", true)   }    
-  }
-  
-
-
-
   return Database
 }

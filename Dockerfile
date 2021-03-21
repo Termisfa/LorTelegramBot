@@ -33,3 +33,9 @@ CMD ["./startBot.sh"]
 	
 #docker buildx build --platform linux/amd64,linux/arm/v7 -t termisfa/lorbot --push .
 #docker run -d --name bot -v /home/pi/checker:/usr/src/app/checker termisfa/lorbot
+
+#TESTS
+#docker buildx build --platform linux/amd64,linux/arm/v7 -t termisfa/test --push .
+#docker run -d --name test -v C:\Users\Public\checker:/usr/src/app/checker termisfa/test
+
+#docker exec -it test /bin/sh
