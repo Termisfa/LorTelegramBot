@@ -1,1 +1,1 @@
-node index.js >./checker/bot_$(date +"%H:%M_%d-%m-%y").log 2>&1
+node index.js >./checker/bot_$(date +"%d-%m-%y_%H:%M").log 2>&1

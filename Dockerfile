@@ -31,5 +31,5 @@ VOLUME /usr/src/app/checker
 
 CMD ["./startBot.sh"]
 	
-#docker buildx build --platform linux/amd64,linux/arm/v7 -t termisfa/bot --push .
-#docker run -d --name bot -v /home/pi/checker:/usr/src/app/checker termisfa/bot
+#docker buildx build --platform linux/amd64,linux/arm/v7 -t termisfa/lorbot --push .
+#docker run -d --name bot -v /home/pi/checker:/usr/src/app/checker termisfa/lorbot
