@@ -305,7 +305,7 @@ module.exports = function(botLog){
         data = data.split('][').join(',');
         fs.writeFile('./allSets-' +  lang + '.json', data, () => { 
             botLog("Terminado proceso de update para " + lang)
-            allCardsArray[0] = JSON.parse(fs.readFileSync('./allSets-' +  lang + '.json'));
+            allCardsArray[positionLang] = JSON.parse(fs.readFileSync('./allSets-' +  lang + '.json'));
         } );
       }
     }
