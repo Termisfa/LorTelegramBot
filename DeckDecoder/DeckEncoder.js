@@ -149,6 +149,6 @@ class DeckEncoder {
   }
 }
 
-DeckEncoder.MAX_KNOWN_VERSION = 3
+DeckEncoder.MAX_KNOWN_VERSION = 4
 
 module.exports = DeckEncoder

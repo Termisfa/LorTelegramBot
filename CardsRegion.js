@@ -10,6 +10,7 @@ module.exports = class CardsRegions {
       this.demacia = 0
       this.jonia = 0
       this.shurima = 0
+      this.bandle = 0
       this.regionsUsed = []
     }
   
@@ -30,6 +31,7 @@ module.exports = class CardsRegions {
             case 'DE': this.demacia += qty;break
             case 'IO': this.jonia += qty;break
             case 'SH': this.shurima += qty;break
+            case 'BC': this.bandle += qty;break
         }
         //Sino hay ya una carta de esta región, la añade
         if(this.regionsUsed.indexOf(region) == -1)
@@ -49,6 +51,7 @@ module.exports = class CardsRegions {
             case 'DE': return this.demacia
             case 'IO': return this.jonia
             case 'SH': return this.shurima
+            case 'BC': return this.bandle
         }
     }
   }

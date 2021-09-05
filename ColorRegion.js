@@ -10,6 +10,7 @@ module.exports = class ColorRegion {
       this.demacia = '191, 176, 131'
       this.jonia = '207, 130, 155'
       this.shurima = '189, 158, 89'
+      this.bandle = '192, 211, 34'
     }
   
     static from () {
@@ -29,6 +30,7 @@ module.exports = class ColorRegion {
             case 'DE': return this.demacia
             case 'IO': return this.jonia
             case 'SH': return this.shurima
+            case 'BC': return this.bandle
         }
     }
   }
