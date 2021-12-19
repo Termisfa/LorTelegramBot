@@ -19,10 +19,6 @@ class DeckEncoder {
     const firstByte = bytes.shift()
     const version = firstByte & 0xF
 
-    if (version > DeckEncoder.MAX_KNOWN_VERSION) {
-      //console.log('The provided code requires a higher version of this library; please update.')
-      return msgError
-    }
 
     for (let i = 3; i > 0; i--) {
       const numGroupOfs = VarInt.pop(bytes)
@@ -148,7 +144,5 @@ class DeckEncoder {
     return result.sort((a, b) => a.length - b.length).map(group => group.sort((a, b) => a.code.localeCompare(b.code)))
   }
 }
-
-DeckEncoder.MAX_KNOWN_VERSION = 4
 
 module.exports = DeckEncoder

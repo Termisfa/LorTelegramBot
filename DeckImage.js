@@ -1,12 +1,13 @@
 const { rejects } = require('assert');
 var fs = require('fs').promises;
 const { resolve } = require('path');
-var ColorRegion = require('./ColorRegion')
-var colorRegion = ColorRegion.from()
 var CardsRegion = require('./CardsRegion')
 var cardsRegion
 var cardMostUsed
 var htmlString
+
+var RegionsHandler = require('./RegionsHandler')
+var regionsHandler = RegionsHandler.from()
 
 
 class DeckImage
@@ -149,7 +150,7 @@ function createDiv(deckList, typeOfCard)
 function createDivCard(cardInDeck)
 {
     //console.log(cardInDeck)
-    var color = colorRegion.getColorRgb(cardInDeck.card.cardCode.slice(2,4))
+    var color = regionsHandler.getColorRgb(cardInDeck.card.cardCode.slice(2,4))
     var divString = "<div class='boxImg'>"
     divString += "<div class='image' style='background: linear-gradient(90deg, rgb(" + color + ") 35%, rgba(" + color + ", 0) 70%), url(https://cdn-lor.mobalytics.gg/production/images/cards-preview/" + cardInDeck.card.cardCode + ".webp) right center no-repeat;'>"
     divString += "<div class='elixirCostBox'><span class='elixirCost'>" + cardInDeck.card.elixirCost + "</span></div>"
@@ -174,7 +175,7 @@ function selectNameForTitle(typeOfCard)
 //Devuelve el div completo con las regiones
 function createDivRegions()
 {
-    var regionsUsed = cardsRegion.regionsUsed.length   
+    var regionsUsed = Object.keys(cardsRegion.regionsUsed).length;
     var divString = ""
     divString = "<div class = 'title'><div class = 'titleLineLeft'></div><div class = 'titleText'>Regiones</div><div class = 'titleLineRight'></div></div>"
     divString += "<div class='regions'>"
@@ -183,10 +184,11 @@ function createDivRegions()
     else
         htmlString = htmlString.replace("4, minmax(min-content, 25%)", regionsUsed + ", minmax(min-content, " + 100/regionsUsed + "%)")
     
-    for(var i = 0; i < regionsUsed; i++)
+    for (var region in cardsRegion.regionsUsed) 
     {
-        divString += createDivOneRegion(cardsRegion.regionsUsed[i])        
+        divString += createDivOneRegion(region)
     }
+
     divString += "</div>"
     return divString
 }

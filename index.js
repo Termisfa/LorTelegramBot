@@ -1,5 +1,8 @@
 const fs = require('fs')
 
+var RegionsHandler = require('./RegionsHandler')
+var regionsHandler = RegionsHandler.from()
+
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -60,17 +63,15 @@ bot.on("polling_error", (error) => {
 fs.copyFileSync('./checkBot.sh', './checker/checkBot.sh') //Se copia y cambia el nombre para que aparezca fuera de docker
 
 
-/*
+
 //Para hacer tests
 bot.onText(/^\!t (.+)/i, (msg, match) => {
   if(checkAdmin(msg))
     {
-      var languages = Database.getLanguages();
-      for(var i = 0; i < languages.length; i++)
-        bot.sendMessage(msg.chat.id, languages[i])
+      regionsHandler.UpdateRegionsTest();
     }
 });
-*/
+
 
 const schedule = require('node-schedule');
 
