@@ -101,7 +101,7 @@ function createDivVertical(deckList)
         countDifferent ++
         divString += createDivCard(cardInDeck)
         countAll += cardInDeck.count           
-        cardsRegion.pushCard(cardInDeck.card.faction, cardInDeck.count)         
+        cardsRegion.pushCard(cardInDeck.card.usedFaction, cardInDeck.count)         
     });
     divString += "</div>"
 
@@ -130,7 +130,7 @@ function createDiv(deckList, typeOfCard)
             divString += createDivCard(cardInDeck)
             countAll += cardInDeck.count
             countDifferent ++
-            cardsRegion.pushCard(cardInDeck.card.faction, cardInDeck.count)
+            cardsRegion.pushCard(cardInDeck.card.usedFaction, cardInDeck.count)
            
         }
     });
@@ -152,7 +152,7 @@ function createDiv(deckList, typeOfCard)
 function createDivCard(cardInDeck)
 {
     //console.log(cardInDeck)
-    var color = regionsHandler.getColorRgb(cardInDeck.card.cardCode.slice(2,4))
+    var color = regionsHandler.getColorRgb(cardInDeck.card.usedFaction)
     var divString = "<div class='boxImg'>"
     divString += "<div class='image' style='background: linear-gradient(90deg, rgb(" + color + ") 35%, rgba(" + color + ", 0) 70%), url(https://cdn-lor.mobalytics.gg/production/images/cards-preview/" + cardInDeck.card.cardCode + ".webp) right center no-repeat;'>"
     divString += "<div class='elixirCostBox'><span class='elixirCost'>" + cardInDeck.card.elixirCost + "</span></div>"

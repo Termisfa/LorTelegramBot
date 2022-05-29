@@ -14,7 +14,8 @@ const token = process.env.BOT_TOKEN
 const bot = new TelegramBot(token, {polling: true});
 
 const chatIdLogs = -333076382; //Id of the group LogBots
-
+// const puppeteerPath = "/usr/bin/chromium"
+const puppeteerPath = "/usr/bin/chromium"
 
 
 
@@ -60,7 +61,30 @@ bot.on("polling_error", (error) => {
   botLog(error, error, "PollingError", true)
 });
 
-fs.copyFileSync('./checkBot.sh', './checker/checkBot.sh') //Se copia y cambia el nombre para que aparezca fuera de docker
+// fs.copyFileSync('./checkBot.sh', './checker/checkBot.sh') //Se copia y cambia el nombre para que aparezca fuera de docker
+
+// const schedule = require('node-schedule');
+
+// createFile()
+// schedule.scheduleJob('55 * * * *', () => createFile()); //Cada hora al minuto 55
+
+// function createFile()
+// {
+//   let ahora = new Date()
+//   let path = './checker/'
+
+//   fs.closeSync(fs.openSync(path + ahora.getHours(), 'w'))
+
+//   ahora.setHours(ahora.getHours() - 1)
+
+//   path += ahora.getHours();
+
+//   if(fs.existsSync(path))
+//     fs.unlinkSync(path) //Borrar el archivo de la hora anterior si existe  
+// }
+
+// var timeInterval = '0 18 * * 0' //Cada domingo a las 18.00
+// var interval = schedule.scheduleJob(timeInterval, () => Database.checkIfUpdated()); 
 
 
 
@@ -72,30 +96,6 @@ bot.onText(/^\!t (.+)/i, (msg, match) => {
     }
 });
 
-
-const schedule = require('node-schedule');
-
-createFile()
-schedule.scheduleJob('55 * * * *', () => createFile()); //Cada hora al minuto 55
-
-function createFile()
-{
-  let ahora = new Date()
-  let path = './checker/'
-
-  fs.closeSync(fs.openSync(path + ahora.getHours(), 'w'))
-
-  ahora.setHours(ahora.getHours() - 1)
-
-  path += ahora.getHours();
-
-  if(fs.existsSync(path))
-    fs.unlinkSync(path) //Borrar el archivo de la hora anterior si existe  
-}
-
-
-var timeInterval = '0 18 * * 0' //Cada domingo a las 18.00
-var interval = schedule.scheduleJob(timeInterval, () => Database.checkIfUpdated()); 
 
 //Comando para activar o desactivar las actualizaciones automáticas
 bot.onText(/^\!auto$/i, (msg, match) => {
@@ -273,7 +273,7 @@ bot.on('inline_query', msg => {
   
   if(!isDeckInline(msg))
   {
-    let infoCardsProv = Database.searchCardByNameAll(msg.query) 
+    let infoCardsProv = Database.searchCardByName(msg.query, true) 
 
     if(infoCardsProv.length > 0)
     {
@@ -320,7 +320,8 @@ function isDeckInline(msg)
   {
     try
     {
-      deck = Database.sortDeckByElixir(deck)   
+      deck = Database.sortDeckByElixir(deck)  
+      deck = Database.fixFactions(deck)
 
       DeckImage.createDeckImage(deck).catch((error) => {
         botLog(error, "isDeckInline", true)
@@ -328,7 +329,7 @@ function isDeckInline(msg)
      .then((htmlCode) => {
         const promise = nodeHtmlToImage({
           html: htmlCode,         
-          puppeteerArgs: {executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] } 
+          puppeteerArgs: {executablePath: puppeteerPath, args: ['--no-sandbox'] } 
         });
         promise
         .catch((error) => {
@@ -398,7 +399,7 @@ function searchDeckCommand(msg, match)
     try
     {
       deck = Database.sortDeckByElixir(deck)   
-
+      deck = Database.fixFactions(deck)
       
       DeckImage.createDeckImage(deck).catch((error) => {
         botLog(error, "searchDeckCommand", true)
@@ -407,7 +408,7 @@ function searchDeckCommand(msg, match)
         //console.log(htmlCode)
         const promise =  nodeHtmlToImage({
           html: htmlCode,
-          puppeteerArgs: {executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] } 
+          puppeteerArgs: {executablePath: puppeteerPath, args: ['--no-sandbox'] } 
         });
         promise.catch((error) => {
           botLog(error, "searchDeckCommand", true)
@@ -450,7 +451,7 @@ function searchDeckCommandVertical(msg, match)
         //console.log(htmlCode)
         const promise =  nodeHtmlToImage({
           html: htmlCode,
-          puppeteerArgs: {executablePath: '/usr/bin/chromium-browser', args: ['--no-sandbox'] } 
+          puppeteerArgs: {executablePath: puppeteerPath, args: ['--no-sandbox'] } 
         });
         promise.catch((error) => {
           botLog(error, "searchDeckCommandVertical", true)
@@ -485,7 +486,7 @@ bot.onText(/^\!C (.+)/i, (msg, match) => {
 function searchCardCommand(msg, match)
 {
   try {
-    let infoCardsProv = Database.searchCardByName(match[1])  
+    let infoCardsProv = Database.searchCardByName(match[1], false)  
 
     const chatId = msg.chat.id;
     if(checkCorrectName(infoCardsProv, match[1], chatId))

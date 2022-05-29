@@ -47,7 +47,15 @@ module.exports = class RegionsHandler {
               return jsonData[i].Id;
         } 
     }
-    
+
+    translateRegionNameIntoCode(regionName)
+    {
+      for(var i = 0; i < jsonData.length; i++)
+      {
+        if(jsonData[i].Name == regionName)
+            return jsonData[i].ShortName;
+      } 
+    }
   }
 
 

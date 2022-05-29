@@ -1,4 +1,4 @@
-
+var CardsRegion = require('./CardsRegion')
 
 module.exports = function(botLog){
   'use strict';
@@ -47,53 +47,25 @@ module.exports = function(botLog){
        
       }
 
-      //Devuelve una lista de cartas coleccionables con todas las que contengan un string
-      static searchCardByName(cardName)
-      {
-          let infoCardsProv = []
-          cardName = cardName.toLowerCase()
-          cardName = removeAccents(cardName)
-          //Busca las cartas en español
-          allCardsArray[0].forEach(card => {
-              if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
-                  infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
-          });
-          //Busca las cartas en los demás idiomas, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
-          for(var i = 1; i < languages.length; i++)
-          {
-            allCardsArray[i].forEach(card => {
-              if(removeAccents(card.name.toLowerCase()).includes(cardName) && card.cardCode.length == 7)
-              {
-                  let bool = false
-                  infoCardsProv.forEach(element => {
-                      if(card.cardCode == element.cardCode)
-                          bool = true
-                  });
-                  if(!bool)
-                      infoCardsProv.push(this.searchCardById(card.cardCode))
-              }   
-            });
-          }
-          
-          return infoCardsProv
-      }
-
       //Devuelve una lista de cartas con todas las que contengan un string, incluídas las no coleccionables
-      static searchCardByNameAll(cardName)
+      static searchCardByName(cardName, includeNonCollectibles)
       {
           let infoCardsProv = []
           cardName = cardName.toLowerCase()
           cardName = removeAccents(cardName)
           //Busca las cartas en español
           allCardsArray[0].forEach(card => {
-              if(removeAccents(card.name.toLowerCase()).includes(cardName))
-                  infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, card.associatedCardRefs, card.cost, getTypeOfCard(card)))
+              if(removeAccents(card.name.toLowerCase()).includes(cardName) && (includeNonCollectibles || card.cardCode.length == 7))
+              {
+                infoCardsProv.push(CardInfo.from(card.cardCode, card.name, card.assets[0].gameAbsolutePath, 
+                                                  card.associatedCardRefs, card.cost, getTypeOfCard(card), card.regionRefs))
+              }
           });
           //Busca las cartas en los demás idiomas, comprueba que no estén ya encontradas, busca su id en español, e incluye esa carta
           for(var i = 1; i < languages.length; i++)
           {
             allCardsArray[i].forEach(card => {
-              if(removeAccents(card.name.toLowerCase()).includes(cardName))
+              if(removeAccents(card.name.toLowerCase()).includes(cardName) && (includeNonCollectibles || card.cardCode.length == 7))
               {
                   let bool = false
                   infoCardsProv.forEach(element => {
@@ -116,9 +88,13 @@ module.exports = function(botLog){
           for(var i = 0; i < allCardsArray[0].length; i++)
           {
               if(allCardsArray[0][i].cardCode === cardId)
-                  return CardInfo.from(allCardsArray[0][i].cardCode, allCardsArray[0][i].name, allCardsArray[0][i].assets[0].gameAbsolutePath, allCardsArray[0][i].associatedCardRefs, allCardsArray[0][i].cost, getTypeOfCard(allCardsArray[0][i]))
+              {
+                return CardInfo.from(allCardsArray[0][i].cardCode, allCardsArray[0][i].name, allCardsArray[0][i].assets[0].gameAbsolutePath, allCardsArray[0][i].associatedCardRefs,
+                                      allCardsArray[0][i].cost, getTypeOfCard(allCardsArray[0][i]), allCardsArray[0][i].regionRefs)
+              }                  
           }
       }
+      
       //Busca cartas relacionadas con una y devuelve la lista
       static getListByCardId(card)
       {
@@ -132,6 +108,7 @@ module.exports = function(botLog){
           });   
           return cardListImages
       }
+
       //Ordena las cartas de un deck por su coste de elixir y la devuelve
       static sortDeckByElixir(deckUnsorted) 
       {
@@ -150,6 +127,57 @@ module.exports = function(botLog){
               elixirCost++
           }        
           return deckSorted
+      }
+
+      //Arregla las regiones para evitar problemas con las multiregión y los campeones de runeterra
+      static fixFactions(deck) 
+      {
+        var cardsRegion = CardsRegion.from()
+        var anyCardMultiregion = false
+
+        deck.forEach(cardInDeck => 
+        {
+          if(cardInDeck.card.factions.length > 1)
+            anyCardMultiregion = true
+
+          cardInDeck.card.factions.forEach(faction =>
+          {
+            cardsRegion.pushCard(faction, cardInDeck.count)
+          });
+        });
+
+        var mostUsedRegion = cardsRegion.getMostUsedRegion(false)
+
+        if(mostUsedRegion == "RU")
+        {
+          var secondMostUsedRegion = cardsRegion.getMostUsedRegion(true)
+
+          deck.forEach(cardInDeck => 
+          {
+            if(cardInDeck.card.factions.includes(secondMostUsedRegion))
+              cardInDeck.card.usedFaction = secondMostUsedRegion
+            else
+              cardInDeck.card.usedFaction = mostUsedRegion
+          });
+        }        
+        else if(anyCardMultiregion && Object.keys(cardsRegion.regionsUsed).length > 1)
+        {
+          cardsRegion.sortRegions()
+
+          var mainRegions = cardsRegion.regionsUsed
+          mainRegions.shift()
+          var secondMostUsedRegion = mainRegions.shift()[0]
+
+          for(var i = 0; i < deck.length; i++)
+          {
+            if(deck[i].card.factions.includes(mostUsedRegion))
+              deck[i].card.usedFaction = mostUsedRegion
+            else if(deck[i].card.factions.includes(secondMostUsedRegion))
+              deck[i].card.usedFaction = secondMostUsedRegion
+          }
+        }
+
+        return deck;
       }
 
       //Descarga el último set, comprueba su fecha, y si es diferente a la actual hace update

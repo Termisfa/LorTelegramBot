@@ -26,13 +26,13 @@
     },
     {
       "Id": "4",
-      "Name": "Piltover & Zaun",
+      "Name": "PiltoverZaun",
       "ShortName": "PZ",
       "Color": "226, 159, 118"
     },
     {
       "Id": "5",
-      "Name": "Shadow Isles",
+      "Name": "ShadowIsles",
       "ShortName": "SI",
       "Color": "59, 125, 111"
     },
@@ -56,7 +56,7 @@
     },
     {
       "Id": "10",
-      "Name": "Bandle",
+      "Name": "BandleCity",
       "ShortName": "BC",
       "Color": "192, 211, 34"
     },

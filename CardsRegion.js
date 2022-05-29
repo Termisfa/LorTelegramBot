@@ -24,11 +24,17 @@ module.exports = class CardsRegions {
     }
 
     //Devuelve la region que tenga más cartas
-    getMostUsedRegion()
+    getMostUsedRegion(ignoreRuneterraRegion)
     {
-      if("RU" in this.regionsUsed)
+      if("RU" in this.regionsUsed && !ignoreRuneterraRegion)
         return "RU"
         
       return Object.entries(this.regionsUsed).reduce((a, b) => a[1] > b[1] ? a : b)[0]
+    }
+
+    //Ordena las regiones por mayor número de cartas a menor
+    sortRegions()
+    {
+      this.regionsUsed = Object.entries(this.regionsUsed).sort(([_a, a], [_b, b]) => b - a)
     }
   }
