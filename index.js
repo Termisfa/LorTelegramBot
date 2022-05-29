@@ -68,7 +68,7 @@ fs.copyFileSync('./checkBot.sh', './checker/checkBot.sh') //Se copia y cambia el
 bot.onText(/^\!t (.+)/i, (msg, match) => {
   if(checkAdmin(msg))
     {
-      regionsHandler.UpdateRegionsTest();
+      
     }
 });
 

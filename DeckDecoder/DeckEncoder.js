@@ -16,8 +16,7 @@ class DeckEncoder {
       return msgError
     }
 
-    const firstByte = bytes.shift()
-    const version = firstByte & 0xF
+    bytes.shift()
 
 
     for (let i = 3; i > 0; i--) {

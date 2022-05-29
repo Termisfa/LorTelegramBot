@@ -1,61 +1,70 @@
 {
-    "regions": [
-      {
-        "Id": "0",
-        "Name": "Demacia",
-        "ShortName": "DE",
-        "Color": "191, 176, 131"
-      },
-      {
-        "Id": "1",
-        "Name": "Freljord",
-        "ShortName": "FR",
-        "Color": "160, 223, 246"
-      },
-      {
-        "Id": "2",
-        "Name": "Ionia",
-        "ShortName": "IO",
-        "Color": "207, 130, 155"
-      },
-      {
-        "Id": "3",
-        "Name": "Noxus",
-        "ShortName": "NX",
-        "Color": "160, 82, 79"
-      },
-      {
-        "Id": "4",
-        "Name": "Piltover & Zaun",
-        "ShortName": "PZ",
-        "Color": "226, 159, 118"
-      },
-      {
-        "Id": "5",
-        "Name": "Shadow Isles",
-        "ShortName": "SI",
-        "Color": "59, 125, 111"
-      },
-      {
-        "Id": "6",
-        "Name": "Bilgewater",
-        "ShortName": "BW",
-        "Color": "180, 86, 58"
-      },
-      {
-        "Id": "7",
-        "Name": "Shurima",
-        "ShortName": "SH",
-        "Color": "189, 158, 89"
-      },
-      {
-        "Id": "9",
-        "Name": "Targon",
-        "ShortName": "MT",
-        "Color": "109, 213, 208"
-      }
-      
-      
-      
-    ]
-  }
+  "regions": [
+    {
+      "Id": "0",
+      "Name": "Demacia",
+      "ShortName": "DE",
+      "Color": "191, 176, 131"
+    },
+    {
+      "Id": "1",
+      "Name": "Freljord",
+      "ShortName": "FR",
+      "Color": "160, 223, 246"
+    },
+    {
+      "Id": "2",
+      "Name": "Ionia",
+      "ShortName": "IO",
+      "Color": "207, 130, 155"
+    },
+    {
+      "Id": "3",
+      "Name": "Noxus",
+      "ShortName": "NX",
+      "Color": "160, 82, 79"
+    },
+    {
+      "Id": "4",
+      "Name": "Piltover & Zaun",
+      "ShortName": "PZ",
+      "Color": "226, 159, 118"
+    },
+    {
+      "Id": "5",
+      "Name": "Shadow Isles",
+      "ShortName": "SI",
+      "Color": "59, 125, 111"
+    },
+    {
+      "Id": "6",
+      "Name": "Bilgewater",
+      "ShortName": "BW",
+      "Color": "180, 86, 58"
+    },
+    {
+      "Id": "7",
+      "Name": "Shurima",
+      "ShortName": "SH",
+      "Color": "189, 158, 89"
+    },
+    {
+      "Id": "9",
+      "Name": "Targon",
+      "ShortName": "MT",
+      "Color": "109, 213, 208"
+    },
+    {
+      "Id": "10",
+      "Name": "Bandle",
+      "ShortName": "BC",
+      "Color": "192, 211, 34"
+    },
+    {
+      "Id": "12",
+      "Name": "Runeterra",
+      "ShortName": "RU",
+      "Color": "139, 117, 74"
+    }               
+  ]
+}

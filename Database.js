@@ -9,7 +9,7 @@ module.exports = function(botLog){
   const CardInfo = require('./CardInfo')
 
   var lastModifiedZip = new Date()
-  var sets = 5 //Cantidad de sets actuales
+  var sets = 6 //Cantidad de sets actuales
 
   const languages = ['es_es', 'en_us', 'es_mx']
   var arrayDownloadFinished

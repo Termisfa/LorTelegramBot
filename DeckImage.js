@@ -39,6 +39,8 @@ class DeckImage
             //Sustituimos el placeholder de regiones
             htmlString = htmlString.replace("placeholderRegions", createDivRegions())
 
+            replaceBckgImg()
+
             //Reemplazamos el height del body según el tipo de carta más usada
             cardMostUsed = cardMostUsed * 45 + 50
             if(cardMostUsed > 550)
@@ -192,6 +194,7 @@ function createDivRegions()
     divString += "</div>"
     return divString
 }
+
 //Devuelve el div de una región
 function createDivOneRegion(region)
 {
@@ -201,6 +204,35 @@ function createDivOneRegion(region)
     divString += "</div></div>"
     
     return divString
+}
+
+function replaceBckgImg()
+{
+    var mostUsedRegion = cardsRegion.getMostUsedRegion();
+    var bckImgUrl
+
+    switch(mostUsedRegion)
+    {
+        case "DE": bckImgUrl = "https://image5.uhdpaper.com/wallpaper-hd/lux-garen-galio-demacia-lol-season-2020-uhdpaper.com-hd-5.1836.jpg"; break;
+        case "FR": bckImgUrl = "https://lol-stats.net/uploads/MS5NogIhWY99fLnw7uoYnJJm1z0FtY8M1aMYEOmm.jpeg"; break;
+        case "IO": bckImgUrl = "https://i.pinimg.com/originals/d5/c8/6b/d5c86b2ef855a35077f4da8a7fbcdb99.png"; break;
+        case "NX": bckImgUrl = "https://images.contentstack.io/v3/assets/blt187521ff0727be24/blt9d0c487b98ba6b42/60ee0ffb975ffd4ff25ec2f5/noxus_splash.jpg"; break;
+        case "PZ": bckImgUrl = "https://1.bp.blogspot.com/-vAFMm7NKeLs/X4wrFQFWKoI/AAAAAAAAEEc/XZOV9aCtXqYOlcz1U52-0BsnHuSeih_PACNcBGAsYHQ/w919/jinx-lol-piltover-zaun-lor-landscape-scenery-uhdpaper.com-4K-8.525-wp.thumbnail.jpg"; break;
+        case "SI": bckImgUrl = "https://lol-stats.net/uploads/QxIeaTC3dFSW5dihRqCZrbsteNzwMRUhk3BKW7Rl.jpeg"; break;
+        case "BW": bckImgUrl = "https://www.wallpaperflare.com/static/964/108/32/bilgewater-league-of-legends-online-game-wallpaper.jpg"; break;
+        case "SH": bckImgUrl = "https://i.pinimg.com/originals/ca/65/55/ca65555c1a1f815713415f0a85c47340.png"; break;
+        case "MT": bckImgUrl = "https://i.pinimg.com/originals/b7/d9/39/b7d93983f7e9c35d12b5909d25245132.jpg"; break;
+        case "BC": bckImgUrl = "https://image-1.uhdpaper.com/b/pc-4k/the-bandle-tree-lor-bandle-city-4k-wallpaper-3840x2160-uhdpaper.com-270.1_b.jpg"; break;
+        case "RU": 
+                {
+                    if(htmlString.includes("Jhin"))
+                        bckImgUrl = "https://i.pinimg.com/originals/7a/38/c9/7a38c91f79695688247c9e341669c5d1.jpg"
+                    else if(htmlString.includes("Bard"))
+                        bckImgUrl = "https://wallpaperaccess.com/full/3290609.jpg"
+                }
+    }
+
+    htmlString = htmlString.replace("placeholderBckgImg", bckImgUrl)
 }
 
 

@@ -13,18 +13,8 @@ module.exports = class RegionsHandler {
     {
         fs.readFile('./regions.json', function(error, data){
             jsonData = JSON.parse(data).regions;
-        console.log(jsonData)
+        // console.log(jsonData)
         })
-    }
-
-    UpdateRegionsTest()
-    {
-        fs.readFile('./regions2.json', function(error, data){
-            jsonData = JSON.parse(data).regions;
-        console.log(jsonData)
-
-          })
-
     }
 
     static from () {
