@@ -42,9 +42,12 @@ module.exports = function(botLog){
         {
           arrayDownloadFinished[i] = new Array()
           for(var j = 0; j < number; j++)
-            download(languages[i], i, j + 1)
-        }
-       
+            download(languages[i], i, j + 1, "")
+
+          //Caso especial para el set 6cde  
+          download(languages[i], i, 6, "cde")
+      }
+
       }
 
       //Devuelve una lista de cartas con todas las que contengan un string, incluídas las no coleccionables
@@ -190,14 +193,14 @@ module.exports = function(botLog){
           request
           .get('https://dd.b.pvp.net/latest/set' + number + '-lite-es_es.zip')
           .on('error', function(error) {
-            botlog(error, error, "checkIfUpdated", true)
+            botLog(error, error, "checkIfUpdated", true)
           })
           .pipe(fs.createWriteStream(downloadSave))
           .on('finish', function() 
           {
             yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
               if (error) 
-                botlog(error, error, "checkIfUpdated", true)
+                botLog(error, error, "checkIfUpdated", true)
               else
               {
                 zipfile.readEntry();
@@ -214,12 +217,12 @@ module.exports = function(botLog){
                 })
               }  
               fs.promises.unlink(downloadSave).catch(error => {
-                botlog(error, error, "checkIfUpdated", true)
+                botLog(error, error, "checkIfUpdated", true)
               })            
             })
           })
         }
-        catch (error)  {  botlog(error, error, "checkIfUpdated", true)   }   
+        catch (error)  {  botLog(error, error, "checkIfUpdated", true)   }   
       }
   }
   
@@ -239,24 +242,24 @@ module.exports = function(botLog){
       return text.split('').map( char => accentsList[char] || char).join('').toString();	
   }
   
-  function download(lang, positionLang, set)
+  function download(lang, positionLang, set, specialCases)
   {
     try
     {
-      var downloadSave = "./set" + set + lang + ".zip"
-      var jsonSave = "set" + set + "-" + lang + ".json"
+      var downloadSave = "./set" + set + specialCases + lang + ".zip"
+      var jsonSave = "set" + set + specialCases + "-" + lang + ".json"
 
       request
-      .get('https://dd.b.pvp.net/latest/set' + set + '-lite-' + lang + '.zip')
+      .get('https://dd.b.pvp.net/latest/set' + set + specialCases + '-lite-' + lang + '.zip')
       .on('error', function(error) {
-        botlog(error, error, "download", true)
+        botLog(error, error, "download", true)
       })
       .pipe(fs.createWriteStream(downloadSave))
       .on('finish', function() {
         unzip(jsonSave, downloadSave, set, lang, positionLang)
       })
     }
-    catch (error)  {  botlog(error, error, "download", true)   }
+    catch (error)  {  botLog(error, error, "download", true)   }
   }
 
   function unzip(jsonSave, downloadSave, set, lang, positionLang)
@@ -266,7 +269,7 @@ module.exports = function(botLog){
       yauzl.open(downloadSave, {lazyEntries: true, autoClose: true}, function(error, zipfile) {
         if (error) 
           fs.promises.unlink(downloadSave).catch(error => {
-            botlog(error, error, "unzip", true)
+            botLog(error, error, "unzip", true)
           })        
         else
         {
@@ -283,7 +286,7 @@ module.exports = function(botLog){
           {
             zipfile.openReadStream(entry, function(error, readStream) {
                 if (error) 
-                  botlog(error, error, "unzip", true)
+                  botLog(error, error, "unzip", true)
                 else
                 {                      
                   readStream.pipe(fs.createWriteStream(jsonSave));
@@ -291,7 +294,7 @@ module.exports = function(botLog){
                     //Ya está creado el json, aquí lo leemos y guardamos en el array
                     fs.readFile(jsonSave, function(error, data){
                       if(error)
-                        botlog(error, error, "unzip", true)
+                        botLog(error, error, "unzip", true)
                       else
                       {
                         arrayDownloadFinished[positionLang].push(data)
@@ -309,24 +312,31 @@ module.exports = function(botLog){
         }      
       })
     } 
-    catch (error)  {  botlog(error, error, "unzip", true)   } 
+    catch (error)  {  botLog(error, error, "unzip", true)   } 
   }
 
   function readFinished(lang, positionLang)
   {
     try
     {
-      if(arrayDownloadFinished[positionLang].length == sets)
+      //El + 1 es por el set especial 6cde
+      if(arrayDownloadFinished[positionLang].length == sets + 1)
       {
         var data = "";
         for(var i = 0; i < sets; i++)
         {
           data += arrayDownloadFinished[positionLang][i];
-          fs.promises.unlink("./set" + (i + 1) + lang + ".zip").catch(error => {
-              botlog(error, error, "readFinished", true)
+          var setName = (i + 1);
+          if(setName == 7)
+          {
+            setName = "6cde";
+          }
+
+          fs.promises.unlink("./set" + setName + lang + ".zip").catch(error => {
+              botLog(error, error, "readFinished", true)
             })
-          fs.promises.unlink("./set" + (i + 1) + "-" + lang + ".json").catch(error => {
-             botlog(error, error, "readFinished", true)
+          fs.promises.unlink("./set" + setName + "-" + lang + ".json").catch(error => {
+             botLog(error, error, "readFinished", true)
             })
         }
         
@@ -337,7 +347,7 @@ module.exports = function(botLog){
         } );
       }
     }
-    catch (error)  {  botlog(error, error, "readFinished", true)   }    
+    catch (error)  {  botLog(error, error, "readFinished", true)   }    
   }
   
   

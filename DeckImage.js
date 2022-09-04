@@ -209,11 +209,11 @@ function createDivOneRegion(region)
 function replaceBckgImg()
 {
     var mostUsedRegion = cardsRegion.getMostUsedRegion();
-    var bckImgUrl
+    var bckImgUrl = "https://i.pinimg.com/originals/5c/32/0e/5c320e40d4fdd8a513fa9a454e22279f.png";
 
     switch(mostUsedRegion)
     {
-        case "DE": bckImgUrl = "https://image5.uhdpaper.com/wallpaper-hd/lux-garen-galio-demacia-lol-season-2020-uhdpaper.com-hd-5.1836.jpg"; break;
+        case "DE": bckImgUrl = "https://i.pinimg.com/originals/d9/5c/d5/d95cd529834608cc6f92db4bb3d497c8.jpg"; break;
         case "FR": bckImgUrl = "https://lol-stats.net/uploads/MS5NogIhWY99fLnw7uoYnJJm1z0FtY8M1aMYEOmm.jpeg"; break;
         case "IO": bckImgUrl = "https://i.pinimg.com/originals/d5/c8/6b/d5c86b2ef855a35077f4da8a7fbcdb99.png"; break;
         case "NX": bckImgUrl = "https://images.contentstack.io/v3/assets/blt187521ff0727be24/blt9d0c487b98ba6b42/60ee0ffb975ffd4ff25ec2f5/noxus_splash.jpg"; break;
@@ -222,13 +222,19 @@ function replaceBckgImg()
         case "BW": bckImgUrl = "https://www.wallpaperflare.com/static/964/108/32/bilgewater-league-of-legends-online-game-wallpaper.jpg"; break;
         case "SH": bckImgUrl = "https://i.pinimg.com/originals/ca/65/55/ca65555c1a1f815713415f0a85c47340.png"; break;
         case "MT": bckImgUrl = "https://i.pinimg.com/originals/b7/d9/39/b7d93983f7e9c35d12b5909d25245132.jpg"; break;
-        case "BC": bckImgUrl = "https://image-1.uhdpaper.com/b/pc-4k/the-bandle-tree-lor-bandle-city-4k-wallpaper-3840x2160-uhdpaper.com-270.1_b.jpg"; break;
+        case "BC": bckImgUrl = "https://cdnportal.mobalytics.gg/production/2021/08/db6517da-teemo-waterfall.jpg"; break;
         case "RU": 
                 {
                     if(htmlString.includes("Jhin"))
                         bckImgUrl = "https://i.pinimg.com/originals/7a/38/c9/7a38c91f79695688247c9e341669c5d1.jpg"
                     else if(htmlString.includes("Bard"))
                         bckImgUrl = "https://wallpaperaccess.com/full/3290609.jpg"
+                    else if(htmlString.includes("Evelynn"))
+                        bckImgUrl = "https://i.pinimg.com/originals/7a/07/e0/7a07e0c28739a0c9c69f5f423a1eaa1a.jpg"
+                    else if(htmlString.includes("Jax"))
+                        bckImgUrl = "https://wallpaperaccess.com/full/1934605.jpg"
+                    else if(htmlString.includes("Kayn"))
+                        bckImgUrl = "https://www.xtrafondos.com/wallpapers/kayn-league-of-legends-art-7370.jpg"
                 }
     }
 
